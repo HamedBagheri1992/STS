@@ -1,21 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
 using STS.Interfaces.Contracts;
+using STS.WebApi.Filters;
 
 namespace STS.WebApi.Controllers.V1
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public class PermissionController : ControllerBase
     {
         private readonly IPermissionService _permissionService;
+        private readonly IRoleService _roleService;
 
-        public PermissionController(IPermissionService permissionService)
+        public PermissionController(IPermissionService permissionService, IRoleService roleService)
         {
             _permissionService = permissionService;
+            _roleService = roleService;
         }
 
         [HttpGet("[action]/{roleId}")]
@@ -32,12 +35,16 @@ namespace STS.WebApi.Controllers.V1
             return Ok(permission);
         }
 
-        [HttpPost]
+        [HttpPost]     
         public async Task<IActionResult> Post([FromBody] AddPermissionFormModel addFormModel)
         {
+            if (!await _roleService.IsExistAsync(addFormModel.RoleId))
+                return NotFound("RoleId is Invalid");
+
             var addedPermission = await _permissionService.AddAsync(addFormModel);
             return CreatedAtAction(nameof(Get), new { roleId = addedPermission.RoleId, permissionId = addedPermission.Id }, addedPermission);
         }
+
 
         // PUT: api/values/5
         [HttpPut]
@@ -47,8 +54,9 @@ namespace STS.WebApi.Controllers.V1
 
         // DELETE: api/values/5
         [HttpDelete]
-        public void Delete(int id)
+        public void Delete()
         {
+            throw new Exception("hamed");
         }
     }
 }

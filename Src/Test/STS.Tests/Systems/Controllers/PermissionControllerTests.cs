@@ -15,10 +15,12 @@ namespace STS.Tests.Systems.Controllers
     public class PermissionControllerTests
     {
         private readonly Mock<IPermissionService> _permissionService;
+        private readonly Mock<IRoleService> _roleService;
 
         public PermissionControllerTests()
         {
             _permissionService = new Mock<IPermissionService>();
+            _roleService = new Mock<IRoleService>();
         }
 
         #region Get_By_RoleId
@@ -27,7 +29,7 @@ namespace STS.Tests.Systems.Controllers
         {
             //Arrange
             int roleId = 1;
-            var sut = new PermissionController(_permissionService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId);
@@ -44,7 +46,7 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             int roleId = 1;
             _permissionService.Setup(p => p.GetAsync(roleId)).ReturnsAsync(PermissionMockDatas.PermissionCollectionViewModels());
-            var sut = new PermissionController(_permissionService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId);
@@ -69,7 +71,7 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             int roleId = 1;
             int permissionId = 1;
-            var sut = new PermissionController(_permissionService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId, permissionId);
@@ -89,7 +91,7 @@ namespace STS.Tests.Systems.Controllers
             var mockPermission = PermissionMockDatas.PermissionSingleViewModel();
 
             _permissionService.Setup(p => p.GetAsync(roleId, permissionId)).ReturnsAsync(mockPermission);
-            var sut = new PermissionController(_permissionService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId, permissionId);
@@ -111,12 +113,13 @@ namespace STS.Tests.Systems.Controllers
         #region Post
 
         [Fact]
-        public async void Post_Should_Return_201()
+        public async void Post_Should_Return_Status_201()
         {
             //Arrang
-            var addFormModel = new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1" };
+            var addFormModel = new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(true);
             _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
-            var sut = new PermissionController(_permissionService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
 
 
             //Act
@@ -124,6 +127,7 @@ namespace STS.Tests.Systems.Controllers
             var result = actionResult as CreatedAtActionResult;
 
             //Assert
+            _permissionService.Verify(per => per.AddAsync(addFormModel), Times.Once);
             Assert.NotNull(result);
             result.StatusCode.Should().Be(201);
 
@@ -134,8 +138,10 @@ namespace STS.Tests.Systems.Controllers
         {
             //Arrang
             var addFormModel = new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1" };
+
+            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(true);
             _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
-            var sut = new PermissionController(_permissionService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
 
 
             //Act
@@ -143,12 +149,36 @@ namespace STS.Tests.Systems.Controllers
             var result = actionResult.Value as PermissionViewModel;
 
             //Assert            
+            _permissionService.Verify(p => p.AddAsync(addFormModel), Times.Once);
+
             actionResult.Value.Should().NotBeNull();
 
             result.Id.Should().NotBe(0);
             result.Title.Should().Be(addFormModel.Title);
             result.DisplayTitle.Should().Be(addFormModel.DisplayTitle);
             result.RoleId.Should().Be(addFormModel.RoleId);
+        }
+
+
+        [Fact]
+        public async void Post_Invalid_RoleId_Return_Status_404()
+        {
+            //Arrange
+            var addFormModel = new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+
+            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(false);
+            _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+
+            //Act
+            var actionResult = await sut.Post(addFormModel);
+            var result = actionResult as NotFoundObjectResult;
+
+            //Assert
+            _permissionService.Verify(per => per.AddAsync(addFormModel), Times.Never);
+            Assert.NotNull(result);
+            result.StatusCode.Should().Be(404);
+            result.Value.Should().Be("RoleId is Invalid");
         }
 
         #endregion

@@ -12,7 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Layers\STS.Common\STS.Common.csproj" />
+    <ProjectReference Include="..\..\Layers\STS.DTOs\STS.DTOs.csproj" />
     <ProjectReference Include="..\..\Layers\STS.Interfaces\STS.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Layers\STS.Services\STS.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Impls\" />
+    <ProjectReference Include="..\STS.Interfaces\STS.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

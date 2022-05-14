@@ -18,19 +18,22 @@ namespace STS.Tests.MockDatas
                 {
                     Id = 1,
                     Title = "Permission_1",
-                    DisplayTitle = "مجوز _ 1"
+                    DisplayTitle = "مجوز _ 1",
+                    RoleId= 1
                 },
                 new PermissionViewModel
                 {
                     Id = 2,
                     Title = "Permission_2",
-                    DisplayTitle = "مجوز _ 2"
+                    DisplayTitle = "مجوز _ 2",
+                    RoleId= 1
                 },
                 new PermissionViewModel
                 {
                     Id = 3,
                     Title = "Permission_3",
-                    DisplayTitle = "مجوز _ 3"
+                    DisplayTitle = "مجوز _ 3",
+                    RoleId= 1
                 }
             };
         }
@@ -41,7 +44,8 @@ namespace STS.Tests.MockDatas
             {
                 Id = 1,
                 Title = "Permission_1",
-                DisplayTitle = "مجوز _ 1"
+                DisplayTitle = "مجوز _ 1",
+                RoleId = 1
             };
         }
         public static PermissionViewModel PermissionSingleViewModel(AddPermissionFormModel formModel)
