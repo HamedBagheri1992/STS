@@ -10,6 +10,5 @@ namespace STS.Interfaces.Contracts
     public interface IRoleService
     {
         Task<bool> IsExistAsync(long id);
-        Task<IEnumerable<RoleViewModel>> GetAsync();
     }
 }

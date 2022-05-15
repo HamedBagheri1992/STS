@@ -1,5 +1,6 @@
 using STS.Common.ExceptionMiddlewareExtensions;
 using STS.Interfaces.Contracts;
+using STS.Services.Extensions;
 using STS.Services.Impls;
 using STS.WebApi.Extensions;
 
@@ -17,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<IPermissionService, PermissionService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 
+builder.Services.RegisterDbContext(builder.Configuration.GetConnectionString("ApplicationDbContextConnection"));
 
 builder.Services.AddApiVersioning();
 

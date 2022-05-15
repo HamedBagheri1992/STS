@@ -10,10 +10,6 @@ namespace STS.Services.Impls
 {
     public class RoleService : IRoleService
     {
-        public Task<IEnumerable<RoleViewModel>> GetAsync()
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<bool> IsExistAsync(long id)
         {
