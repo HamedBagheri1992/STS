@@ -16,12 +16,32 @@ namespace STS.Services.Impls
             throw new NotImplementedException();
         }
 
+        public Task DeleteAsync(long id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<PermissionViewModel>> GetAsync(int roleId)
         {
             throw new NotImplementedException();
         }
 
         public Task<PermissionViewModel> GetAsync(int roleId, int permissionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsPermissionValidAsync(long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsTitleDuplicateAsync(string title)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAsync(UpdatePermissionFormModel updateFormModel)
         {
             throw new NotImplementedException();
         }

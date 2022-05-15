@@ -15,7 +15,7 @@ namespace STS.Services.Impls
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsExistAsync(int id)
+        public Task<bool> IsExistAsync(long id)
         {
             throw new NotImplementedException();
         }

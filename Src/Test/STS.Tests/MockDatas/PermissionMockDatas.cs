@@ -58,5 +58,15 @@ namespace STS.Tests.MockDatas
                 RoleId = formModel.RoleId
             };
         }
+
+        public static AddPermissionFormModel AddFormModel()
+        {
+            return new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+        }
+
+        public static UpdatePermissionFormModel UpdateFormModel()
+        {
+            return new UpdatePermissionFormModel { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+        }
     }
 }

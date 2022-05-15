@@ -8,8 +8,8 @@ namespace STS.DTOs.PermissionModels.ViewModels
 {
     public class PermissionViewModel
     {
-        public int Id { get; set; }
-        public int RoleId { get; set; }
+        public long Id { get; set; }
+        public long RoleId { get; set; }
         public string Title { get; set; }
         public string DisplayTitle { get; set; }
     }

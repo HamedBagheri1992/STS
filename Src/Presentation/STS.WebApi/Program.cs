@@ -1,18 +1,17 @@
 using STS.Common.ExceptionMiddlewareExtensions;
 using STS.Interfaces.Contracts;
 using STS.Services.Impls;
-using STS.WebApi.Filters;
+using STS.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddScoped<ValidationFilterAttribute>();
-
-builder.Services.AddControllers(options =>
+builder.Services.AddControllers().ConfigureApiBehaviorOptions((opt =>
 {
-    options.Filters.AddService<ValidationFilterAttribute>();
-});
+    opt.ChangeModelStateInvalidModel();
+}));
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddTransient<IPermissionService, PermissionService>();
