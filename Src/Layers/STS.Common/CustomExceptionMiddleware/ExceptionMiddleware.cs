@@ -24,19 +24,19 @@ namespace STS.Common.CustomExceptionMiddleware
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong: {ex}");
-                await HandleExceptionAsync(httpContext);
+                _logger.LogError($"{DateTime.Now} : {ex}");
+                await HandleExceptionAsync(httpContext, ex.Message);
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context)
+        private Task HandleExceptionAsync(HttpContext context, string message)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             return context.Response.WriteAsync(new ErrorDetails
             {
                 ErrorCode = context.Response.StatusCode.ToString(),
-                Messages = new List<string>() { "Internal Server Error from the custom middleware." }
+                Messages = new List<string>() { message }
             }.ToString());
         }
     }

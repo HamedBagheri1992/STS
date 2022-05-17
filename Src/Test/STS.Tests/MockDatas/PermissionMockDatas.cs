@@ -1,4 +1,5 @@
-﻿using STS.DTOs.PermissionModels.FormModels;
+﻿using STS.DataAccessLayer.Entities;
+using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,38 @@ namespace STS.Tests.MockDatas
                     Title = "Permission_3",
                     DisplayTitle = "مجوز _ 3",
                     RoleId= 1
+                }
+            };
+        }
+
+        public static IEnumerable<Permission> PermissionCollectionEntityModels()
+        {
+            var role = new Role { Id = 1, Caption = "Role" };
+            return new List<Permission>
+            {
+                new Permission
+                {
+                    Id = 1,
+                    Title = "Permission_1",
+                    DisplayTitle = "مجوز _ 1",
+                    RoleId= role.Id,
+                    Role=role
+                },
+                new Permission
+                {
+                    Id = 2,
+                    Title = "Permission_2",
+                    DisplayTitle = "مجوز _ 2",
+                    RoleId= role.Id,
+                    Role=role
+                },
+                new Permission
+                {
+                    Id = 3,
+                    Title = "Permission_3",
+                    DisplayTitle = "مجوز _ 3",
+                    RoleId= role.Id,
+                    Role=role
                 }
             };
         }

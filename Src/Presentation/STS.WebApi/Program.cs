@@ -18,7 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<IPermissionService, PermissionService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 
-builder.Services.RegisterDbContext(builder.Configuration.GetConnectionString("ApplicationDbContextConnection"));
+builder.Services.AddDbContext(builder.Configuration);
 
 builder.Services.AddApiVersioning();
 

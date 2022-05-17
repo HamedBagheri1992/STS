@@ -43,7 +43,12 @@ namespace STS.WebApi.Controllers.V1
             if (await _permissionService.IsTitleDuplicateAsync(addFormModel.Title))
                 return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission Title is Duplicate"));
 
-            var addedPermission = await _permissionService.AddAsync(addFormModel);
+            long permissionId = await _permissionService.AddAsync(addFormModel);
+
+            var addedPermission = await _permissionService.GetAsync(addFormModel.RoleId, permissionId);
+            if (addedPermission is null)
+                return NotFound(ErrorDetailsHelper.VerificationErrorDetails("Permission Added Problem"));
+
             return CreatedAtAction(nameof(Get), new { roleId = addedPermission.RoleId, permissionId = addedPermission.Id }, addedPermission);
         }
 
@@ -56,7 +61,7 @@ namespace STS.WebApi.Controllers.V1
             if (!await _permissionService.IsPermissionValidAsync(updateFormModel.Id))
                 return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission is Invalid"));
 
-            if (await _permissionService.IsTitleDuplicateAsync(updateFormModel.Title))
+            if (await _permissionService.IsTitleDuplicateAsync(updateFormModel.Id, updateFormModel.Title))
                 return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission Title is Duplicate"));
 
 

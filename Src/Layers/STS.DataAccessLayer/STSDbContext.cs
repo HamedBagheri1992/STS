@@ -10,9 +10,9 @@ namespace STS.DataAccessLayer
 {
     public class STSDbContext : DbContext
     {
-        public STSDbContext(DbContextOptions<STSDbContext> options) : base(options)
-        {
-        }
+        //public STSDbContext(DbContextOptions<STSDbContext> options) : base(options)
+        //{
+        //}
 
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
