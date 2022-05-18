@@ -11,6 +11,8 @@ namespace STS.DTOs.RoleModels.ViewModels
     {
         public long Id { get; set; }
         public string Caption { get; set; }
+        public long ApplicationId { get; set; }
+        public string ApplicationTitle { get; set; }
         public IEnumerable<PermissionViewModel> Permissions { get; set; }
     }
 }

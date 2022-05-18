@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace STS.DataAccessLayer.Entities
 {
+    [Table("Permission")]
     public class Permission : BaseEntity
     {
         public long RoleId { get; set; }

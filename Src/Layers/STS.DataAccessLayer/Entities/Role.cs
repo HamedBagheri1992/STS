@@ -16,7 +16,10 @@ namespace STS.DataAccessLayer.Entities
         }
 
         public string Caption { get; set; }
+        public long ApplicationId { get; set; }
 
+        [ForeignKey("ApplicationId")]
+        public virtual Application Application { get; set; }
         public virtual ICollection<Permission> Permissions { get; set; }
     }
 }

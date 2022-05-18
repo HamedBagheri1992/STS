@@ -15,8 +15,9 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions((opt =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddTransient<IPermissionService, PermissionService>();
+builder.Services.AddTransient<IApplicationService, ApplicationService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IPermissionService, PermissionService>();
 
 builder.Services.AddDbContext(builder.Configuration);
 

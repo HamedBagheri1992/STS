@@ -21,14 +21,14 @@ namespace STS.WebApi.Controllers.V1
         }
 
         [HttpGet("{roleId}")]
-        public async Task<ActionResult<IEnumerable<PermissionViewModel>>> Get(int roleId)
+        public async Task<ActionResult<IEnumerable<PermissionViewModel>>> Get(long roleId)
         {
             var permissions = await _permissionService.GetAsync(roleId);
             return Ok(permissions);
         }
 
         [HttpGet("{roleId}/{permissionId}")]
-        public async Task<ActionResult<PermissionViewModel>> Get(int roleId, int permissionId)
+        public async Task<ActionResult<PermissionViewModel>> Get(long roleId, long permissionId)
         {
             var permission = await _permissionService.GetAsync(roleId, permissionId);
             return Ok(permission);

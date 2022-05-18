@@ -19,16 +19,26 @@ namespace STS.DataAccessLayer
         {
         }
 
+        public virtual DbSet<Application> Applications { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
 
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Application>(entity =>
+            {
+                entity.HasIndex(a => a.Title).IsUnique();
+                entity.HasIndex(a => new { a.SecretKey, a.Id });
+            });
+
+
             modelBuilder.Entity<Permission>(entity =>
             {
-                entity.HasIndex(e => e.Title).IsUnique();
+                entity.HasIndex(p => p.Title).IsUnique();
             });
+
 
             base.OnModelCreating(modelBuilder);
         }

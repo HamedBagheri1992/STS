@@ -5,11 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STS.DTOs.PermissionModels.FormModels
+namespace STS.DTOs.RoleModels.FormModels
 {
-    public class UpdatePermissionFormModel : AddPermissionFormModel
+    public class AddRoleFormModel
     {
         [Required]
-        public long Id { get; set; }
+        public string Caption { get; set; }
+
+        [Required]
+        public long ApplicationId { get; set; }
     }
 }

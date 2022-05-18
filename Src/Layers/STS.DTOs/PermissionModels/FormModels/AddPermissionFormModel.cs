@@ -9,7 +9,9 @@ namespace STS.DTOs.PermissionModels.FormModels
 {
     public class AddPermissionFormModel
     {
+        [Required]
         public long RoleId { get; set; }
+
         [Required]
         public string Title { get; set; }
 

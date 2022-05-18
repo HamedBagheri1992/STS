@@ -84,7 +84,7 @@ namespace STS.Tests.Systems.Controllers
         }
 
         [Fact]
-        public async void Get_By_RoleId_And_PermissionId_Should_Return_Permission_One_Permission()
+        public async void Get_By_RoleId_And_PermissionId_Should_Return_One_Permission()
         {
             //Arrange
             int roleId = 1;
