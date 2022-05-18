@@ -11,7 +11,7 @@ namespace STS.Tests.MockDatas
 {
     public static class PermissionMockDatas
     {
-        public static IEnumerable<PermissionViewModel> PermissionCollectionViewModels()
+        public static List<PermissionViewModel> PermissionCollectionViewModels()
         {
             return new List<PermissionViewModel>
             {
@@ -39,7 +39,7 @@ namespace STS.Tests.MockDatas
             };
         }
 
-        public static IEnumerable<Permission> PermissionCollectionEntityModels()
+        public static List<Permission> PermissionCollectionEntityModels()
         {
             var role = new Role { Id = 1, Caption = "Role" };
             return new List<Permission>
@@ -100,6 +100,11 @@ namespace STS.Tests.MockDatas
         public static UpdatePermissionFormModel UpdateFormModel()
         {
             return new UpdatePermissionFormModel { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+        }
+
+        public static Permission EntityModel()
+        {
+            return new Permission { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
         }
     }
 }

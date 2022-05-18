@@ -56,7 +56,7 @@ namespace STS.Tests.Systems.Controllers
 
             //Assert
             result.Should().NotBeNull();
-            var permissions = result.Value as IEnumerable<PermissionViewModel>;
+            var permissions = result.Value as List<PermissionViewModel>;
             permissions.Should().HaveCount(PermissionMockDatas.PermissionCollectionViewModels().Count());
 
         }

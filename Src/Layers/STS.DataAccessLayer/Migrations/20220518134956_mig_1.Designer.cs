@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using STS.DataAccessLayer;
 
@@ -10,9 +11,10 @@ using STS.DataAccessLayer;
 namespace STS.DataAccessLayer.Migrations
 {
     [DbContext(typeof(STSDbContext))]
-    partial class STSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220518134956_mig_1")]
+    partial class mig_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

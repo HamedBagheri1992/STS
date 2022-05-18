@@ -7,7 +7,7 @@ namespace STS.Interfaces.Contracts
 {
     public interface IPermissionService
     {
-        Task<IEnumerable<PermissionViewModel>> GetAsync(long roleId);
+        Task<List<PermissionViewModel>> GetAsync(long roleId);
         Task<PermissionViewModel?> GetAsync(long roleId, long permissionId);
         Task<long> AddAsync(AddPermissionFormModel addFormModel);
         Task UpdateAsync(UpdatePermissionFormModel updateFormModel);

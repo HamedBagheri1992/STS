@@ -40,24 +40,7 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task DeleteAsync(long id)
-        {
-            try
-            {
-                var permission = await _context.Permissions.FindAsync(id);
-                if (permission is null)
-                    throw new Exception("PermissionService : Permission is Invalid");
-
-                _context.Permissions.Remove(permission);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception("PermissionService : DeleteError");
-            }
-        }
-
-        public async Task<IEnumerable<PermissionViewModel>> GetAsync(long roleId)
+        public async Task<List<PermissionViewModel>> GetAsync(long roleId)
         {
             try
             {
@@ -79,6 +62,48 @@ namespace STS.Services.Impls
             catch (Exception)
             {
                 throw new Exception("PermissionService : Get(roleId,permissionId)Error");
+            }
+        }
+
+        public async Task UpdateAsync(UpdatePermissionFormModel updateFormModel)
+        {
+            try
+            {
+                var permission = await _context.Permissions.FindAsync(updateFormModel.Id);
+                if (permission is null)
+                    throw new Exception("PermissionService : Permission is Invalid");
+
+                if (permission.Title != updateFormModel.Title)
+                    permission.Title = updateFormModel.Title;
+
+                if (permission.DisplayTitle != updateFormModel.DisplayTitle)
+                    permission.DisplayTitle = updateFormModel.DisplayTitle;
+
+                if (permission.RoleId != updateFormModel.RoleId)
+                    permission.RoleId = updateFormModel.RoleId;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new Exception("PermissionService : UpdateError");
+            }
+        }
+
+        public async Task DeleteAsync(long id)
+        {
+            try
+            {
+                var permission = await _context.Permissions.FindAsync(id);
+                if (permission is null)
+                    throw new Exception("PermissionService : Permission is Invalid");
+
+                _context.Permissions.Remove(permission);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new Exception("PermissionService : DeleteError");
             }
         }
 
@@ -118,24 +143,5 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task UpdateAsync(UpdatePermissionFormModel updateFormModel)
-        {
-            try
-            {
-                var permission = await _context.Permissions.FindAsync(updateFormModel.Id);
-                if (permission is null)
-                    throw new Exception("PermissionService : Permission is Invalid");
-
-                permission.Title = updateFormModel.Title;
-                permission.DisplayTitle = updateFormModel.DisplayTitle;
-                permission.RoleId = updateFormModel.RoleId;
-
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception("PermissionService : UpdateError");
-            }
-        }
     }
 }
