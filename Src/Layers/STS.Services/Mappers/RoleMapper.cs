@@ -16,6 +16,8 @@ namespace STS.Services.Mappers
             {
                 Id = item.Id,
                 Caption = item.Caption,
+                ApplicationTitle = item.Application.Title,
+                ApplicationId = item.Application.Id,
                 Permissions = item.Permissions.ToViewModel()
             });
         }
@@ -26,6 +28,8 @@ namespace STS.Services.Mappers
             {
                 Id = item.Id,
                 Caption = item.Caption,
+                ApplicationTitle = item.Application.Title,
+                ApplicationId = item.Application.Id,
                 Permissions = item.Permissions.ToViewModel()
             };
         }

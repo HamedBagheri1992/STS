@@ -7,8 +7,9 @@ using STS.WebApi.Helper;
 
 namespace STS.WebApi.Controllers.V1
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
