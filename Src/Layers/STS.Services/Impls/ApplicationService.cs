@@ -1,60 +1,145 @@
-﻿using STS.DTOs.ApplicationModels.FormModels;
+﻿using Microsoft.EntityFrameworkCore;
+using STS.DataAccessLayer;
+using STS.DataAccessLayer.Entities;
+using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.RoleModels.ViewModels;
+using STS.DTOs.CommonModels;
 using STS.Interfaces.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using STS.Services.Mappers;
 
 namespace STS.Services.Impls
 {
     public class ApplicationService : IApplicationService
     {
-        public Task<long> AddAsync(AddApplicationFormModel addFormModel)
+        private readonly STSDbContext _context;
+
+        public ApplicationService(STSDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task DeleteAsync(long id)
+        public async Task<PagedList<ApplicationViewModel>> GetAsync(PaginationParam pagination)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var applications = _context.Applications.Include(a => a.Permissions).Include(a => a.Roles).OrderBy(a => a.Id).ToViewModel();
+                return await applications.ToPagedListAsync<ApplicationViewModel>(pagination.PageNumber, pagination.PageSize);
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : GetError");
+            }
         }
 
-        public Task<ApplicationViewModel> GetAsync()
+        public async Task<ApplicationViewModel?> GetAsync(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var application = await _context.Applications.Include(a => a.Permissions).Include(a => a.Roles).FirstOrDefaultAsync(a => a.Id == id);
+                return application?.ToViewModel();
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : Get(id)Error");
+            }
         }
 
-        public Task<ApplicationViewModel> GetAsync(long application)
+        public async Task<long> AddAsync(AddApplicationFormModel addFormModel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var application = new Application
+                {
+                    Title = addFormModel.Title,
+                    SecretKey = Guid.NewGuid(),
+                    Description = addFormModel.Description,
+                    CreatedDate = DateTime.Now
+                };
+
+                await _context.Applications.AddAsync(application);
+                await _context.SaveChangesAsync();
+
+                return application.Id;
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : AddError");
+            }
         }
 
-        public Task<bool> IsApplicationValidAsync(long id)
+        public async Task UpdateAsync(UpdateApplicationFormModel updateFormModel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var application = await _context.Applications.FindAsync(updateFormModel.Id);
+                if (application is null)
+                    throw new Exception("ApplicationService : Application is Invalid");
+
+                if (application.Title != updateFormModel.Title)
+                    application.Title = updateFormModel.Title;
+
+                if (application.Description != updateFormModel.Description)
+                    application.Description = updateFormModel.Description;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : UpdateError");
+            }
         }
 
-        public Task<bool> IsExistAsync(long applicationId)
+        public async Task DeleteAsync(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var application = await _context.Applications.FindAsync(id);
+                if (application is null)
+                    throw new Exception("ApplicationService : Application is Invalid");
+
+                _context.Applications.Remove(application);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : DeleteError");
+            }
         }
 
-        public Task<bool> IsTitleDuplicateAsync(string title)
+        public async Task<bool> IsExistAsync(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Applications.AnyAsync(a => a.Id == id);
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : IsExistError");
+            }
         }
 
-        public Task<bool> IsTitleDuplicateAsync(long id, string title)
+        public async Task<bool> IsTitleDuplicateAsync(string title)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Applications.AnyAsync(a => a.Title == title);
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : IsTitleDuplicate(title)Error");
+            }
         }
 
-        public Task UpdateAsync(UpdateApplicationFormModel updateFormModel)
+        public async Task<bool> IsTitleDuplicateAsync(long id, string title)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Applications.AnyAsync(a => a.Id != id && a.Title == title);
+            }
+            catch (Exception)
+            {
+                throw new Exception("ApplicationService : IsTitleDuplicate(id,title)Error");
+            }
         }
     }
 }

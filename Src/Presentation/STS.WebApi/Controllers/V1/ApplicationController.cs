@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.CommonModels;
 using STS.Interfaces.Contracts;
 using STS.WebApi.Helper;
 
@@ -20,16 +21,16 @@ namespace STS.WebApi.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ApplicationViewModel>>> Get()
+        public async Task<ActionResult<PagedList<ApplicationViewModel>>> Get([FromQuery] PaginationParam pagination)
         {
-            var applications = await _applicationService.GetAsync();
+            var applications = await _applicationService.GetAsync(pagination);
             return Ok(applications);
         }
 
-        [HttpGet("{applicationId}")]
-        public async Task<ActionResult<ApplicationViewModel>> Get(long applicationId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ApplicationViewModel>> Get([FromRoute] long id)
         {
-            var application = await _applicationService.GetAsync(applicationId);
+            var application = await _applicationService.GetAsync(id);
             return Ok(application);
         }
 
@@ -65,7 +66,7 @@ namespace STS.WebApi.Controllers.V1
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (!await _applicationService.IsApplicationValidAsync(id))
+            if (!await _applicationService.IsExistAsync(id))
                 return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Application is Invalid"));
 
             await _applicationService.DeleteAsync(id);

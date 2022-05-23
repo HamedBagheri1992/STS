@@ -36,9 +36,14 @@ namespace STS.DataAccessLayer
 
             modelBuilder.Entity<Permission>(entity =>
             {
-                entity.HasIndex(p => p.Title).IsUnique();
+                entity.HasIndex(p => new { p.Title, p.ApllicationId }).IsUnique();
             });
 
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasIndex(r => new { r.Caption, r.ApplicationId }).IsUnique();
+            });
 
             base.OnModelCreating(modelBuilder);
         }

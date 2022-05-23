@@ -13,6 +13,7 @@ namespace STS.Interfaces.Contracts
         Task<long> AddAsync(AddRoleFormModel addFormModel);
         Task<List<RoleViewModel>> GetAsync(long applicationId);
         Task<RoleViewModel?> GetAsync(long applicationId, long roleId);
+        Task<RoleViewModel?> GetByIdAsync(long id);
         Task UpdateAsync(UpdateRoleFormModel updateFormModel);
         Task DeleteAsync(long id);
 

@@ -22,6 +22,19 @@ namespace STS.Services.Mappers
             });
         }
 
+
+        public static IEnumerable<RoleViewModel> ToViewModel(this IEnumerable<Role> query)
+        {
+            return query.Select(item => new RoleViewModel
+            {
+                Id = item.Id,
+                Caption = item.Caption,
+                ApplicationTitle = item.Application.Title,
+                ApplicationId = item.Application.Id,
+                Permissions = item.Permissions.ToViewModel()
+            });
+        }
+
         public static RoleViewModel ToViewModel(this Role item)
         {
             return new RoleViewModel

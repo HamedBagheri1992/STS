@@ -13,6 +13,7 @@ namespace STS.DataAccessLayer.Entities
         public Application()
         {
             Roles = new List<Role>();
+            Permissions = new List<Permission>();
         }
 
         public string Title { get; set; }
@@ -22,5 +23,6 @@ namespace STS.DataAccessLayer.Entities
 
 
         public virtual ICollection<Role> Roles { get; set; }
+        public virtual ICollection<Permission> Permissions { get; set; }
     }
 }

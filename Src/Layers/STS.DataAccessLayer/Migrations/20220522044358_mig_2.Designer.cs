@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using STS.DataAccessLayer;
 
@@ -11,9 +12,10 @@ using STS.DataAccessLayer;
 namespace STS.DataAccessLayer.Migrations
 {
     [DbContext(typeof(STSDbContext))]
-    partial class STSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220522044358_mig_2")]
+    partial class mig_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,7 +84,7 @@ namespace STS.DataAccessLayer.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("Title", "ApllicationId")
+                    b.HasIndex("Title")
                         .IsUnique()
                         .HasFilter("[Title] IS NOT NULL");
 
@@ -101,15 +103,11 @@ namespace STS.DataAccessLayer.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Caption")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationId");
-
-                    b.HasIndex("Caption", "ApplicationId")
-                        .IsUnique()
-                        .HasFilter("[Caption] IS NOT NULL");
 
                     b.ToTable("Role");
                 });

@@ -49,11 +49,11 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task<RoleViewModel?> GetBgIdAsync(long roleId)
+        public async Task<RoleViewModel?> GetByIdAsync(long id)
         {
             try
             {
-                var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions).FirstOrDefaultAsync(x => x.Id == roleId);
+                var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions).FirstOrDefaultAsync(x => x.Id == id);
                 return role?.ToViewModel();
             }
             catch (Exception)

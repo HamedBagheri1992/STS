@@ -113,6 +113,48 @@ namespace STS.Tests.Systems.Services
 
         #endregion
 
+        #region GetById
+
+        [Fact]
+        public async void GetById_Should_Return_Single_Role()
+        {
+            //Arrange
+            long id = 1;
+            var data = RoleMockDatas.RoleCollectionEntityModels().AsQueryable();
+
+            _mockRoleSet.IqueryableRegisteration(data);
+            _mockContext.Setup(c => c.Roles).Returns(_mockRoleSet.Object);
+
+            //Act
+            var sut = new RoleService(_mockContext.Object);
+            var result = await sut.GetByIdAsync(id);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<RoleViewModel>();
+            result.Id.Should().Be(id);
+        }
+
+        [Fact]
+        public async void GetById_Invalid_RoleId_Should_Return_Null()
+        {
+            //Arrange
+            long id = -1;
+            var data = RoleMockDatas.RoleCollectionEntityModels().AsQueryable();
+
+            _mockRoleSet.IqueryableRegisteration(data);
+            _mockContext.Setup(c => c.Roles).Returns(_mockRoleSet.Object);
+
+            //Act
+            var sut = new RoleService(_mockContext.Object);
+            var result = await sut.GetByIdAsync(id);
+
+            //Assert
+            result.Should().BeNull();
+        }
+
+        #endregion
+
         #region Update
 
         [Fact]
@@ -196,7 +238,7 @@ namespace STS.Tests.Systems.Services
 
         #endregion
 
-        #region IsTitleDuplicate
+        #region IsCaptionDuplicate
 
         [Fact]
         public async void IsCaptionDuplicate_By_NonDuplicate_Caption_Shold_Return_False()
@@ -219,14 +261,14 @@ namespace STS.Tests.Systems.Services
         public async void IsCaptionDuplicate_By_Duplicate_Caption_Shold_Return_True()
         {
             //Arrange
-            string title = "Role_1";
+            string caption = "Role_1";
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(title);
+            var result = await sut.IsCaptionDuplicateAsync(caption);
 
             //Assert
             result.Should().BeTrue();
@@ -234,21 +276,21 @@ namespace STS.Tests.Systems.Services
 
         #endregion
 
-        #region IsTitleDuplicate
+        #region IsCaptionDuplicate
 
         [Fact]
         public async void IsCaptionDuplicate_By_RoleId_And_NonDuplicate_Caption_Shold_Return_False()
         {
             //Arrange
             long roleId = 1;
-            string title = "Role_Unique";
+            string caption = "Role_Unique";
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(roleId, title);
+            var result = await sut.IsCaptionDuplicateAsync(roleId, caption);
 
             //Assert
             result.Should().BeFalse();
@@ -259,14 +301,14 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             long roleId = 2;
-            string title = "Role_1";
+            string caption = "Role_1";
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(roleId, title);
+            var result = await sut.IsCaptionDuplicateAsync(roleId, caption);
 
             //Assert
             result.Should().BeTrue();
@@ -278,14 +320,14 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             long roleId = 1;
-            string title = "Role_1";
+            string caption = "Role_1";
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(roleId, title);
+            var result = await sut.IsCaptionDuplicateAsync(roleId, caption);
 
             //Assert
             result.Should().BeFalse();

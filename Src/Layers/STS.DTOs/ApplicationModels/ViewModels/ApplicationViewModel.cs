@@ -1,9 +1,5 @@
-﻿using STS.DTOs.RoleModels.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using STS.DTOs.PermissionModels.ViewModels;
+using STS.DTOs.RoleModels.ViewModels;
 
 namespace STS.DTOs.ApplicationModels.ViewModels
 {
@@ -11,10 +7,10 @@ namespace STS.DTOs.ApplicationModels.ViewModels
     {
         public long Id { get; set; }
         public string Title { get; set; }
-        public Guid SecretKey { get; set; }
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
 
-        public List<RoleViewModel> Roles { get; set; }
+        public IEnumerable<RoleViewModel> Roles { get; set; }
+        public IEnumerable<PermissionViewModel> Permissions { get; set; }
     }
 }
