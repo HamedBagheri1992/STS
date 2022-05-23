@@ -24,9 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Layers\STS.DTOs\STS.DTOs.csproj" />
-    <ProjectReference Include="..\..\Layers\STS.Interfaces\STS.Interfaces.csproj" />
-    <ProjectReference Include="..\..\Presentation\STS.WebApi\STS.WebApi.csproj" />
+    <ProjectReference Include="..\..\Src\Layers\STS.DTOs\STS.DTOs.csproj" />
+    <ProjectReference Include="..\..\Src\Layers\STS.Interfaces\STS.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Src\Presentation\STS.WebApi\STS.WebApi.csproj" />
   </ItemGroup>
 
 </Project>
