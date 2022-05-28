@@ -18,6 +18,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<IApplicationService, ApplicationService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPermissionService, PermissionService>();
+builder.Services.AddTransient<IUserService, UserService>();
+
 
 builder.Services.AddDbContext(builder.Configuration);
 

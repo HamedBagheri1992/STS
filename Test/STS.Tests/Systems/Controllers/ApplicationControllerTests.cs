@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using STS.Common.BaseModels;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.CommonModels;
+using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
 using STS.Tests.MockDatas;
 using STS.WebApi.Controllers.V1;
@@ -57,7 +57,7 @@ namespace STS.Tests.Systems.Controllers
 
             //Assert
             result.Should().NotBeNull();
-            var app = result.Value as PagedList<ApplicationViewModel>;
+            var app = result.Value as PaginatedResult<ApplicationViewModel>;
             app.Items.Should().NotBeNull();
             app.Items.Should().HaveCount(mockApplication.Items.Count);
         }

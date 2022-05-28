@@ -2,14 +2,13 @@
 using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
 using STS.Interfaces.Contracts;
-using STS.WebApi.Helper;
 
 namespace STS.WebApi.Controllers.V1
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class PermissionController : ControllerBase
+    public class PermissionController : BaseController
     {
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
@@ -38,16 +37,16 @@ namespace STS.WebApi.Controllers.V1
         public async Task<IActionResult> Post(AddPermissionFormModel addFormModel)
         {
             if (!await _roleService.IsExistAsync(addFormModel.RoleId))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("RoleId is Invalid"));
+                return BadError("RoleId is Invalid");
 
             if (await _permissionService.IsTitleDuplicateAsync(addFormModel.Title))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission Title is Duplicate"));
+                return BadError("Permission Title is Duplicate");
 
             long permissionId = await _permissionService.AddAsync(addFormModel);
 
             var addedPermission = await _permissionService.GetAsync(addFormModel.RoleId, permissionId);
             if (addedPermission is null)
-                return NotFound(ErrorDetailsHelper.VerificationErrorDetails("Permission Added Problem"));
+                return NotError("Permission Added Problem");
 
             return CreatedAtAction(nameof(Get), new { roleId = addedPermission.RoleId, permissionId = addedPermission.Id }, addedPermission);
         }
@@ -56,13 +55,13 @@ namespace STS.WebApi.Controllers.V1
         public async Task<IActionResult> Put([FromBody] UpdatePermissionFormModel updateFormModel)
         {
             if (!await _roleService.IsExistAsync(updateFormModel.RoleId))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("RoleId is Invalid"));
+                return BadError("RoleId is Invalid");
 
             if (!await _permissionService.IsPermissionValidAsync(updateFormModel.Id))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission is Invalid"));
+                return BadError("Permission is Invalid");
 
             if (await _permissionService.IsTitleDuplicateAsync(updateFormModel.Id, updateFormModel.Title))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission Title is Duplicate"));
+                return BadError("Permission Title is Duplicate");
 
 
             await _permissionService.UpdateAsync(updateFormModel);
@@ -73,7 +72,7 @@ namespace STS.WebApi.Controllers.V1
         public async Task<IActionResult> Delete(long id)
         {
             if (!await _permissionService.IsPermissionValidAsync(id))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Permission is Invalid"));
+                return BadError("Permission is Invalid");
 
             await _permissionService.DeleteAsync(id);
             return NoContent();

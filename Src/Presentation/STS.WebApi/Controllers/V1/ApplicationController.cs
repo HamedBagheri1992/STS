@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.CommonModels;
+using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
-using STS.WebApi.Helper;
 
 namespace STS.WebApi.Controllers.V1
 {
@@ -21,7 +20,7 @@ namespace STS.WebApi.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<ApplicationViewModel>>> Get([FromQuery] PaginationParam pagination)
+        public async Task<ActionResult<PaginatedResult<ApplicationViewModel>>> Get([FromQuery] PaginationParam pagination)
         {
             var applications = await _applicationService.GetAsync(pagination);
             return Ok(applications);
@@ -38,13 +37,13 @@ namespace STS.WebApi.Controllers.V1
         public async Task<IActionResult> Post(AddApplicationFormModel addFormModel)
         {
             if (await _applicationService.IsTitleDuplicateAsync(addFormModel.Title))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Application Title is Duplicate"));
+                return BadError("Application Title is Duplicate");
 
             long applicationId = await _applicationService.AddAsync(addFormModel);
 
             var addedApp = await _applicationService.GetAsync(applicationId);
             if (addedApp is null)
-                return NotFound(ErrorDetailsHelper.VerificationErrorDetails("Application Added Problem"));
+                return NotError("Application Added Problem");
 
             return CreatedAtAction(nameof(Get), new { applicationId = addedApp.Id }, addedApp);
         }
@@ -53,10 +52,10 @@ namespace STS.WebApi.Controllers.V1
         public async Task<IActionResult> Put([FromBody] UpdateApplicationFormModel updateFormModel)
         {
             if (!await _applicationService.IsExistAsync(updateFormModel.Id))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Application is Invalid"));
+                return BadError("Application is Invalid");
 
             if (await _applicationService.IsTitleDuplicateAsync(updateFormModel.Id, updateFormModel.Title))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Application Title is Duplicate"));
+                return BadError("Application Title is Duplicate");
 
 
             await _applicationService.UpdateAsync(updateFormModel);
@@ -67,7 +66,7 @@ namespace STS.WebApi.Controllers.V1
         public async Task<IActionResult> Delete(long id)
         {
             if (!await _applicationService.IsExistAsync(id))
-                return BadRequest(ErrorDetailsHelper.VerificationErrorDetails("Application is Invalid"));
+                return BadError("Application is Invalid");
 
             await _applicationService.DeleteAsync(id);
             return NoContent();

@@ -9,8 +9,15 @@ namespace STS.Common.BaseModels
 {
     public class ErrorDetails
     {
-        public string ErrorCode { get; set; }
-        public List<string> Messages { get; set; }
+        public ErrorDetails()
+        {
+            Error = new List<string>();
+        }
+
+        public int Status { get; set; }
+        public string StatusText { get; set; }
+        public string Message { get; set; }
+        public List<string> Error { get; set; }
 
         public override string ToString()
         {

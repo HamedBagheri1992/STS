@@ -4,7 +4,7 @@ using Moq;
 using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.CommonModels;
+using STS.DTOs.ResultModels;
 using STS.Services.Impls;
 using STS.Tests.Helpers;
 using STS.Tests.MockDatas;
@@ -67,7 +67,7 @@ namespace STS.Tests.Systems.Services
 
             //Assert
             result.Should().NotBeNull();
-            result.Should().BeOfType<PagedList<ApplicationViewModel>>();
+            result.Should().BeOfType<PaginatedResult<ApplicationViewModel>>();
             result.Items.Should().HaveCount(data.Count());
         }
 

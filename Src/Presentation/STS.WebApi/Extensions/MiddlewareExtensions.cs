@@ -9,8 +9,9 @@ namespace STS.WebApi.Extensions
         {
             opt.InvalidModelStateResponseFactory = (context => new BadRequestObjectResult(new ErrorDetails
             {
-                ErrorCode = $"{context.RouteData.Values["controller"]}-{context.RouteData.Values["action"]}-ModelError",
-                Messages = context.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList()
+                Status = 400,
+                StatusText = $"{context.RouteData.Values["controller"]}-{context.RouteData.Values["action"]}-ModelError",
+                Error = context.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList()
             }));
         }
     }

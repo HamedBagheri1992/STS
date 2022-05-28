@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using STS.DataAccessLayer;
 
@@ -11,9 +12,10 @@ using STS.DataAccessLayer;
 namespace STS.DataAccessLayer.Migrations
 {
     [DbContext(typeof(STSDbContext))]
-    partial class STSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220528142406_mig_4")]
+    partial class mig_4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,18 +176,12 @@ namespace STS.DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Password")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasFilter("[UserName] IS NOT NULL");
-
-                    b.HasIndex("UserName", "Password");
 
                     b.ToTable("User");
                 });

@@ -1,7 +1,7 @@
 ﻿using STS.DataAccessLayer.Entities;
 using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.CommonModels;
+using STS.DTOs.ResultModels;
 using STS.DTOs.PermissionModels.ViewModels;
 using STS.DTOs.RoleModels.ViewModels;
 using System;
@@ -14,7 +14,7 @@ namespace STS.Tests.MockDatas
 {
     public static class ApplicationMockDatas
     {
-        public static PagedList<ApplicationViewModel> ApplicationPagedCollectionViewModels(PaginationParam pagination)
+        public static PaginatedResult<ApplicationViewModel> ApplicationPagedCollectionViewModels(PaginationParam pagination)
         {
             var Items = new List<ApplicationViewModel>{
                     new ApplicationViewModel
@@ -46,7 +46,7 @@ namespace STS.Tests.MockDatas
                         }
                 };
 
-            return new PagedList<ApplicationViewModel>(Items, 3, pagination.PageNumber, pagination.PageSize);
+            return new PaginatedResult<ApplicationViewModel>(Items, 3, pagination.PageNumber, pagination.PageSize);
         }
 
         public static List<ApplicationViewModel> ApplicationCollectionViewModels()

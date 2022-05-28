@@ -35,8 +35,9 @@ namespace STS.Common.CustomExceptionMiddleware
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             return context.Response.WriteAsync(new ErrorDetails
             {
-                ErrorCode = context.Response.StatusCode.ToString(),
-                Messages = new List<string>() { message }
+                Status = context.Response.StatusCode,
+                StatusText = "System Error",
+                Message = message
             }.ToString());
         }
     }

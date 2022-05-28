@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STS.DTOs.CommonModels
+namespace STS.DTOs.ResultModels
 {
     public class PaginationParam
     {

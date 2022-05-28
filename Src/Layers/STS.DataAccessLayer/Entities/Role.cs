@@ -12,6 +12,7 @@ namespace STS.DataAccessLayer.Entities
     {
         public Role()
         {
+            Users = new List<User>();
             Permissions = new List<Permission>();
         }
 
@@ -20,6 +21,7 @@ namespace STS.DataAccessLayer.Entities
 
         [ForeignKey("ApplicationId")]
         public virtual Application Application { get; set; }
+        public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<Permission> Permissions { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
 using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.CommonModels;
+using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
 using STS.Services.Mappers;
 
@@ -18,7 +18,7 @@ namespace STS.Services.Impls
             _context = context;
         }
 
-        public async Task<PagedList<ApplicationViewModel>> GetAsync(PaginationParam pagination)
+        public async Task<PaginatedResult<ApplicationViewModel>> GetAsync(PaginationParam pagination)
         {
             try
             {

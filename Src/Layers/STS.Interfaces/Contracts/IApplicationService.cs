@@ -1,12 +1,12 @@
 ﻿using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
-using STS.DTOs.CommonModels;
+using STS.DTOs.ResultModels;
 
 namespace STS.Interfaces.Contracts
 {
     public interface IApplicationService
     {
-        Task<PagedList<ApplicationViewModel>> GetAsync(PaginationParam pagination);
+        Task<PaginatedResult<ApplicationViewModel>> GetAsync(PaginationParam pagination);
         Task<ApplicationViewModel?> GetAsync(long id);
         Task<long> AddAsync(AddApplicationFormModel addFormModel);
         Task UpdateAsync(UpdateApplicationFormModel updateFormModel);

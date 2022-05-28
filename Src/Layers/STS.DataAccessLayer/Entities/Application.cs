@@ -12,6 +12,7 @@ namespace STS.DataAccessLayer.Entities
     {
         public Application()
         {
+            Users = new List<User>();
             Roles = new List<Role>();
             Permissions = new List<Permission>();
         }
@@ -22,6 +23,7 @@ namespace STS.DataAccessLayer.Entities
         public DateTime CreatedDate { get; set; }
 
 
+        public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<Role> Roles { get; set; }
         public virtual ICollection<Permission> Permissions { get; set; }
     }
