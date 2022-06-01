@@ -29,9 +29,9 @@ namespace STS.Services.Impls
                 var roles = _context.Roles.Where(x => x.ApplicationId == applicationId).Include(r => r.Application).Include(r => r.Permissions).AsQueryable();
                 return await roles.ToViewModel().ToListAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : Get(applicationId)Error");
+                throw new Exception("RoleService : Get(applicationId)Error", ex);
             }
         }
 
@@ -43,9 +43,9 @@ namespace STS.Services.Impls
                     .FirstOrDefaultAsync(x => x.ApplicationId == applicationId && x.Id == roleId);
                 return role?.ToViewModel();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : Get(applicationId,roleId)Error");
+                throw new Exception("RoleService : Get(applicationId,roleId)Error", ex);
             }
         }
 
@@ -56,9 +56,9 @@ namespace STS.Services.Impls
                 var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions).FirstOrDefaultAsync(x => x.Id == id);
                 return role?.ToViewModel();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : Get(roleId)Error");
+                throw new Exception("RoleService : Get(roleId)Error", ex);
             }
         }
 
@@ -78,9 +78,9 @@ namespace STS.Services.Impls
                 return role.Id;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : AddError");
+                throw new Exception("RoleService : AddError", ex);
             }
         }
 
@@ -100,9 +100,9 @@ namespace STS.Services.Impls
 
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : UpdateError");
+                throw new Exception("RoleService : UpdateError", ex);
             }
         }
 
@@ -117,9 +117,9 @@ namespace STS.Services.Impls
                 _context.Roles.Remove(role);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : DeleteError");
+                throw new Exception("RoleService : DeleteError", ex);
             }
         }
 
@@ -129,9 +129,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Roles.AnyAsync(r => r.Caption == caption);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : IsCaptionDuplicateError");
+                throw new Exception("RoleService : IsCaptionDuplicateError", ex);
             }
         }
 
@@ -141,9 +141,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Roles.AnyAsync(r => r.Id != id && r.Caption == caption);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : IsCaptionDuplicate(id, caption)Error");
+                throw new Exception("RoleService : IsCaptionDuplicate(id, caption)Error", ex);
             }
         }
 
@@ -153,9 +153,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Roles.AnyAsync(r => r.Id == id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : IsExistError");
+                throw new Exception("RoleService : IsExistError", ex);
             }
         }
 
@@ -165,9 +165,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Roles.AnyAsync(r => r.Id == id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("RoleService : IsRoleValidError");
+                throw new Exception("RoleService : IsRoleValidError", ex);
             }
         }
     }

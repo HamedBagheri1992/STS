@@ -70,10 +70,10 @@ namespace STS.Tests.Systems.Services
         }
 
         [Fact]
-        public async void Get_By_RoleId_And_PermissionId_Should_Return_Permission()
+        public async void Get_By_ApplicationId_And_PermissionId_Should_Return_Permission()
         {
             //Arrange
-            long roleId = 1;
+            long applicationId = 1;
             long permissionId = 1;
             var data = PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable();
 
@@ -82,13 +82,13 @@ namespace STS.Tests.Systems.Services
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.GetAsync(roleId, permissionId);
+            var result = await sut.GetAsync(applicationId, permissionId);
 
             //Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<PermissionViewModel>();
             result.Id.Should().Be(permissionId);
-            result.RoleId.Should().Be(roleId);
+            result.ApplicationId.Should().Be(applicationId);
         }
 
         [Fact]

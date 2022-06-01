@@ -17,11 +17,13 @@ namespace STS.Tests.Systems.Controllers
     {
         private readonly Mock<IPermissionService> _permissionService;
         private readonly Mock<IRoleService> _roleService;
+        private readonly Mock<IApplicationService> _applicationService;
 
         public PermissionControllerTests()
         {
             _permissionService = new Mock<IPermissionService>();
             _roleService = new Mock<IRoleService>();
+            _applicationService = new Mock<IApplicationService>();
         }
 
         #region Get_By_RoleId
@@ -30,7 +32,7 @@ namespace STS.Tests.Systems.Controllers
         {
             //Arrange
             int roleId = 1;
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId);
@@ -47,7 +49,7 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             int roleId = 1;
             _permissionService.Setup(p => p.GetAsync(roleId)).ReturnsAsync(PermissionMockDatas.PermissionCollectionViewModels());
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId);
@@ -72,7 +74,7 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             int roleId = 1;
             int permissionId = 1;
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId, permissionId);
@@ -92,7 +94,7 @@ namespace STS.Tests.Systems.Controllers
             var mockPermission = PermissionMockDatas.PermissionSingleViewModel();
 
             _permissionService.Setup(p => p.GetAsync(roleId, permissionId)).ReturnsAsync(mockPermission);
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Get(roleId, permissionId);
@@ -120,13 +122,13 @@ namespace STS.Tests.Systems.Controllers
             var addFormModel = PermissionMockDatas.AddFormModel();
             var addedId = 1;
 
-            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(true);
+            _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(true);
 
             _permissionService.Setup(r => r.IsTitleDuplicateAsync(addFormModel.Title)).ReturnsAsync(false);
             _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(addedId);
-            _permissionService.Setup(p => p.GetAsync(addFormModel.RoleId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
+            _permissionService.Setup(p => p.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
 
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
 
             //Act
@@ -147,12 +149,12 @@ namespace STS.Tests.Systems.Controllers
             var addFormModel = PermissionMockDatas.AddFormModel();
             var addedId = 1;
 
-            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(true);
+            _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(true);
             _permissionService.Setup(r => r.IsTitleDuplicateAsync(addFormModel.Title)).ReturnsAsync(false);
-            _permissionService.Setup(p => p.GetAsync(addFormModel.RoleId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
+            _permissionService.Setup(p => p.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
 
             _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(addedId);
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
 
             //Act
@@ -167,23 +169,23 @@ namespace STS.Tests.Systems.Controllers
             result.Id.Should().NotBe(0);
             result.Title.Should().Be(addFormModel.Title);
             result.DisplayTitle.Should().Be(addFormModel.DisplayTitle);
-            result.RoleId.Should().Be(addFormModel.RoleId);
+            result.ApplicationId.Should().Be(addFormModel.ApplicationId);
         }
 
         [Fact]
-        public async void Post_Invalid_RoleId_Return_Status_400()
+        public async void Post_Invalid_ApplicationId_Return_Status_400()
         {
             //Arrange
             var addFormModel = PermissionMockDatas.AddFormModel();
             var addedId = 1;
 
-            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(false);
+            _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(false);
             _permissionService.Setup(r => r.IsTitleDuplicateAsync(addFormModel.Title)).ReturnsAsync(false);
             _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(addedId);
-            _permissionService.Setup(p => p.GetAsync(addFormModel.RoleId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
+            _permissionService.Setup(p => p.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
 
 
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Post(addFormModel);
@@ -203,12 +205,12 @@ namespace STS.Tests.Systems.Controllers
             var addFormModel = PermissionMockDatas.AddFormModel();
             var addedId = 1;
 
-            _roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(true);
+            //_roleService.Setup(r => r.IsExistAsync(addFormModel.RoleId)).ReturnsAsync(true);
             _permissionService.Setup(r => r.IsTitleDuplicateAsync(addFormModel.Title)).ReturnsAsync(true);
             _permissionService.Setup(p => p.AddAsync(addFormModel)).ReturnsAsync(addedId);
-            _permissionService.Setup(p => p.GetAsync(addFormModel.RoleId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
+            //_permissionService.Setup(p => p.GetAsync(addFormModel.RoleId, addedId)).ReturnsAsync(PermissionMockDatas.PermissionSingleViewModel(addFormModel));
 
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Post(addFormModel);
@@ -232,11 +234,11 @@ namespace STS.Tests.Systems.Controllers
             //Arrang
             var updateFormModel = PermissionMockDatas.UpdateFormModel();
 
-            _roleService.Setup(r => r.IsExistAsync(updateFormModel.RoleId)).ReturnsAsync(true);
+            _applicationService.Setup(r => r.IsExistAsync(updateFormModel.ApplicationId)).ReturnsAsync(true);
             _permissionService.Setup(p => p.IsPermissionValidAsync(updateFormModel.Id)).ReturnsAsync(true);
 
             _permissionService.Setup(p => p.UpdateAsync(updateFormModel));
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
 
             //Act
@@ -251,16 +253,16 @@ namespace STS.Tests.Systems.Controllers
         }
 
         [Fact]
-        public async void Put_Invalid_RoleId_Return_Status_400()
+        public async void Put_Invalid_ApplicationId_Return_Status_400()
         {
             //Arrange
             var updateFormModel = PermissionMockDatas.UpdateFormModel();
 
-            _roleService.Setup(r => r.IsExistAsync(updateFormModel.RoleId)).ReturnsAsync(false);
+            _applicationService.Setup(r => r.IsExistAsync(updateFormModel.ApplicationId)).ReturnsAsync(false);
             _permissionService.Setup(p => p.IsPermissionValidAsync(updateFormModel.Id)).ReturnsAsync(true);
 
             _permissionService.Setup(p => p.UpdateAsync(updateFormModel));
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Put(updateFormModel);
@@ -279,11 +281,11 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             var updateFormModel = PermissionMockDatas.UpdateFormModel();
 
-            _roleService.Setup(r => r.IsExistAsync(updateFormModel.RoleId)).ReturnsAsync(true);
+            //_roleService.Setup(r => r.IsExistAsync(updateFormModel.RoleId)).ReturnsAsync(true);
             _permissionService.Setup(p => p.IsPermissionValidAsync(updateFormModel.Id)).ReturnsAsync(false);
 
             _permissionService.Setup(p => p.UpdateAsync(updateFormModel));
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Put(updateFormModel);
@@ -302,12 +304,12 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             var updateFormModel = PermissionMockDatas.UpdateFormModel();
 
-            _roleService.Setup(r => r.IsExistAsync(updateFormModel.RoleId)).ReturnsAsync(true);
+            //_roleService.Setup(r => r.IsExistAsync(updateFormModel.RoleId)).ReturnsAsync(true);
             _permissionService.Setup(p => p.IsPermissionValidAsync(updateFormModel.Id)).ReturnsAsync(true);
             _permissionService.Setup(p => p.IsTitleDuplicateAsync(updateFormModel.Id, updateFormModel.Title)).ReturnsAsync(true);
 
             _permissionService.Setup(p => p.UpdateAsync(updateFormModel));
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Put(updateFormModel);
@@ -333,7 +335,7 @@ namespace STS.Tests.Systems.Controllers
             _permissionService.Setup(p => p.IsPermissionValidAsync(id)).ReturnsAsync(true);
 
             _permissionService.Setup(p => p.DeleteAsync(id));
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
 
             //Act
@@ -354,7 +356,7 @@ namespace STS.Tests.Systems.Controllers
             _permissionService.Setup(p => p.IsPermissionValidAsync(id)).ReturnsAsync(false);
 
             _permissionService.Setup(p => p.DeleteAsync(id));
-            var sut = new PermissionController(_permissionService.Object, _roleService.Object);
+            var sut = new PermissionController(_permissionService.Object, _roleService.Object, _applicationService.Object);
 
             //Act
             var actionResult = await sut.Delete(id);

@@ -18,23 +18,23 @@ namespace STS.Tests.MockDatas
                 new PermissionViewModel
                 {
                     Id = 1,
+                    ApplicationId= 1,
                     Title = "Permission_1",
-                    DisplayTitle = "مجوز _ 1",
-                    RoleId= 1
+                    DisplayTitle = "مجوز _ 1"
                 },
                 new PermissionViewModel
                 {
                     Id = 2,
+                    ApplicationId= 1,
                     Title = "Permission_2",
-                    DisplayTitle = "مجوز _ 2",
-                    RoleId= 1
+                    DisplayTitle = "مجوز _ 2"
                 },
                 new PermissionViewModel
                 {
                     Id = 3,
+                    ApplicationId= 1,
                     Title = "Permission_3",
-                    DisplayTitle = "مجوز _ 3",
-                    RoleId= 1
+                    DisplayTitle = "مجوز _ 3"
                 }
             };
         }
@@ -47,26 +47,23 @@ namespace STS.Tests.MockDatas
                 new Permission
                 {
                     Id = 1,
+                    ApplicationId= 1,
                     Title = "Permission_1",
-                    DisplayTitle = "مجوز _ 1",
-                    RoleId= role.Id,
-                    Role=role
+                    DisplayTitle = "مجوز _ 1"
                 },
                 new Permission
                 {
                     Id = 2,
+                    ApplicationId= 1,
                     Title = "Permission_2",
-                    DisplayTitle = "مجوز _ 2",
-                    RoleId= role.Id,
-                    Role=role
+                    DisplayTitle = "مجوز _ 2"
                 },
                 new Permission
                 {
                     Id = 3,
+                    ApplicationId= 1,
                     Title = "Permission_3",
-                    DisplayTitle = "مجوز _ 3",
-                    RoleId= role.Id,
-                    Role=role
+                    DisplayTitle = "مجوز _ 3"
                 }
             };
         }
@@ -77,8 +74,7 @@ namespace STS.Tests.MockDatas
             {
                 Id = 1,
                 Title = "Permission_1",
-                DisplayTitle = "مجوز _ 1",
-                RoleId = 1
+                DisplayTitle = "مجوز _ 1"
             };
         }
         public static PermissionViewModel PermissionSingleViewModel(AddPermissionFormModel formModel)
@@ -86,25 +82,25 @@ namespace STS.Tests.MockDatas
             return new PermissionViewModel
             {
                 Id = 1,
+                ApplicationId = formModel.ApplicationId,
                 Title = formModel.Title,
-                DisplayTitle = formModel.DisplayTitle,
-                RoleId = formModel.RoleId
+                DisplayTitle = formModel.DisplayTitle
             };
         }
 
         public static AddPermissionFormModel AddFormModel()
         {
-            return new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+            return new AddPermissionFormModel { Title = "Permission_1", DisplayTitle = "مجوز_1", ApplicationId = 1 };
         }
 
         public static UpdatePermissionFormModel UpdateFormModel()
         {
-            return new UpdatePermissionFormModel { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+            return new UpdatePermissionFormModel { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1", ApplicationId = 1 };
         }
 
         public static Permission EntityModel()
         {
-            return new Permission { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1", RoleId = 1 };
+            return new Permission { Id = 1, Title = "Permission_1", DisplayTitle = "مجوز_1" };
         }
     }
 }

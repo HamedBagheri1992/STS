@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using STS.DataAccessLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STS.DataAccessLayer
 {
@@ -25,7 +20,6 @@ namespace STS.DataAccessLayer
         public virtual DbSet<Permission> Permissions { get; set; }
 
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>
@@ -38,18 +32,25 @@ namespace STS.DataAccessLayer
             {
                 entity.HasIndex(a => a.Title).IsUnique();
                 entity.HasIndex(a => new { a.SecretKey, a.Id });
+                entity.HasMany(e => e.Permissions).WithOne(e => e.Application).HasForeignKey(e => e.ApplicationId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(e => e.Roles).WithOne(e => e.Application).HasForeignKey(e => e.ApplicationId).OnDelete(DeleteBehavior.Cascade);
             });
 
 
             modelBuilder.Entity<Permission>(entity =>
             {
-                entity.HasIndex(p => new { p.Title, p.ApllicationId }).IsUnique();
+                entity.HasIndex(p => new { p.Title, p.ApplicationId }).IsUnique();
             });
 
 
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.HasIndex(r => new { r.Caption, r.ApplicationId }).IsUnique();
+                entity.HasMany(p => p.Permissions).WithMany(p => p.Roles).UsingEntity<Dictionary<string, object>>("RolePermission", j =>
+                {
+                    j.HasOne<Role>().WithMany().HasForeignKey("RolesId").HasConstraintName("FK_RolePermission_Roless_RolesId").OnDelete(DeleteBehavior.NoAction);
+                    j.HasOne<Permission>().WithMany().HasForeignKey("PermissionsId").HasConstraintName("FK_RolePermission_Permissions_PermissionsId").OnDelete(DeleteBehavior.NoAction);
+                });
             });
 
             base.OnModelCreating(modelBuilder);

@@ -1,10 +1,5 @@
 ﻿using STS.DataAccessLayer.Entities;
 using STS.DTOs.PermissionModels.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STS.Services.Mappers
 {
@@ -15,7 +10,7 @@ namespace STS.Services.Mappers
             return query.Select(item => new PermissionViewModel
             {
                 Id = item.Id,
-                RoleId = item.RoleId,
+                ApplicationId = item.ApplicationId,
                 DisplayTitle = item.DisplayTitle,
                 Title = item.Title
             });
@@ -26,7 +21,7 @@ namespace STS.Services.Mappers
             return query.Select(item => new PermissionViewModel
             {
                 Id = item.Id,
-                RoleId = item.RoleId,
+                ApplicationId = item.ApplicationId,
                 DisplayTitle = item.DisplayTitle,
                 Title = item.Title
             });
@@ -37,7 +32,7 @@ namespace STS.Services.Mappers
             return new PermissionViewModel
             {
                 Id = item.Id,
-                RoleId = item.RoleId,
+                ApplicationId = item.ApplicationId,
                 DisplayTitle = item.DisplayTitle,
                 Title = item.Title
             };

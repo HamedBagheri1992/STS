@@ -24,7 +24,6 @@ namespace STS.Services.Impls
                 var permission = new Permission
                 {
                     DisplayTitle = addFormModel.DisplayTitle,
-                    RoleId = addFormModel.RoleId,
                     Title = addFormModel.Title
                 };
 
@@ -34,34 +33,34 @@ namespace STS.Services.Impls
                 return permission.Id;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : AddError");
+                throw new Exception("PermissionService : AddError", ex);
             }
         }
 
-        public async Task<List<PermissionViewModel>> GetAsync(long roleId)
+        public async Task<List<PermissionViewModel>> GetAsync(long applicationId)
         {
             try
             {
-                return await _context.Permissions.Include(p => p.Role).Where(p => p.RoleId == roleId).ToViewModel().ToListAsync();
+                return await _context.Permissions.Include(p => p.Roles).Where(r => r.ApplicationId == applicationId).ToViewModel().ToListAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : Get(roleId)Error");
+                throw new Exception("PermissionService : Get(roleId)Error", ex);
             }
         }
 
-        public async Task<PermissionViewModel?> GetAsync(long roleId, long permissionId)
+        public async Task<PermissionViewModel?> GetAsync(long applicationId, long permissionId)
         {
             try
             {
-                var permission = await _context.Permissions.Include(p => p.Role).FirstOrDefaultAsync(p => p.Id == permissionId && p.RoleId == roleId);
+                var permission = await _context.Permissions.Include(p => p.Roles).FirstOrDefaultAsync(p => p.Id == permissionId && p.ApplicationId == applicationId);
                 return permission?.ToViewModel();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : Get(roleId,permissionId)Error");
+                throw new Exception("PermissionService : Get(roleId,permissionId)Error", ex);
             }
         }
 
@@ -79,14 +78,14 @@ namespace STS.Services.Impls
                 if (permission.DisplayTitle != updateFormModel.DisplayTitle)
                     permission.DisplayTitle = updateFormModel.DisplayTitle;
 
-                if (permission.RoleId != updateFormModel.RoleId)
-                    permission.RoleId = updateFormModel.RoleId;
+                if (permission.ApplicationId != updateFormModel.ApplicationId)
+                    permission.ApplicationId = updateFormModel.ApplicationId;
 
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : UpdateError");
+                throw new Exception("PermissionService : UpdateError", ex);
             }
         }
 
@@ -101,9 +100,9 @@ namespace STS.Services.Impls
                 _context.Permissions.Remove(permission);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : DeleteError");
+                throw new Exception("PermissionService : DeleteError", ex);
             }
         }
 
@@ -113,9 +112,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Permissions.AnyAsync(p => p.Id == id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : IsPermissionValidError");
+                throw new Exception("PermissionService : IsPermissionValidError", ex);
             }
         }
 
@@ -125,9 +124,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Permissions.AnyAsync(p => p.Title == title);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : IsTitleDuplicate(title)Error");
+                throw new Exception("PermissionService : IsTitleDuplicate(title)Error", ex);
             }
         }
 
@@ -137,11 +136,10 @@ namespace STS.Services.Impls
             {
                 return await _context.Permissions.AnyAsync(p => p.Title == title && p.Id != permissionId);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("PermissionService : IsTitleDuplicate(permissionId,title)Error");
+                throw new Exception("PermissionService : IsTitleDuplicate(permissionId,title)Error", ex);
             }
         }
-
     }
 }

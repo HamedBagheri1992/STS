@@ -14,6 +14,7 @@ namespace STS.Interfaces.Contracts
 
         Task<bool> IsTitleDuplicateAsync(string title);
         Task<bool> IsExistAsync(long id);
+        Task<bool> IsExistAsync(long id, Guid secretKey);
         Task<bool> IsTitleDuplicateAsync(long id, string title);
     }
 }

@@ -252,7 +252,7 @@ namespace STS.Tests.Systems.Services
         }
 
         [Fact]
-        public async void IsCaptionDuplicate_By_RoleId_And_Duplicate_Caption_Shold_Return_True()
+        public async void IsTitleDuplicate_By_ApplicationId_And_Duplicate_Title_Shold_Return_True()
         {
             //Arrange
             long id = 2;

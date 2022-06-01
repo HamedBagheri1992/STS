@@ -1,12 +1,20 @@
+using STS.Common.Configuration;
 using STS.Common.ExceptionMiddlewareExtensions;
 using STS.Interfaces.Contracts;
 using STS.Services.Extensions;
 using STS.Services.Impls;
+using STS.Services.ServiceSetups;
 using STS.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+#region Configuration
+
+builder.Services.Configure<BearerTokensConfigurationModel>(builder.Configuration.GetSection(BearerTokensConfigurationModel.Name));
+
+#endregion
 
 builder.Services.AddControllers().ConfigureApiBehaviorOptions((opt =>
 {
@@ -15,6 +23,7 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions((opt =>
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<IApplicationService, ApplicationService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPermissionService, PermissionService>();
@@ -22,13 +31,12 @@ builder.Services.AddTransient<IUserService, UserService>();
 
 
 builder.Services.AddDbContext(builder.Configuration);
-
 builder.Services.AddApiVersioning();
+builder.Services.ConfigureAuthentication(builder.Configuration);
 
 
-builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwaggerGen();
 builder.Services.AddLogging();
-builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -46,14 +54,11 @@ app.UseSwaggerUI();
 app.ConfigureCustomExceptionMiddleware();
 
 
-app.UseCors(options => options.WithOrigins(
-    builder.Configuration.GetSection("AppSettings").GetValue<string>("AllowedOrigins")
-    .Split(";")).AllowAnyMethod().AllowCredentials().AllowAnyHeader().AllowAnyMethod().Build());
-
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.MigrationDatabase().Run();

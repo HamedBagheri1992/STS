@@ -18,8 +18,21 @@ namespace STS.Services.Mappers
                 Title = item.Title,
                 Description = item.Description,
                 CreatedDate = item.CreatedDate,
-                Roles = item.Roles.ToViewModel(),
-                Permissions = item.Permissions.ToViewModel()
+                RoleCount = item.Roles.Count(),
+                PermissionCount = item.Permissions.Count()
+            });
+        }
+
+        public static IEnumerable<ApplicationViewModel> ToViewModel(this IEnumerable<Application> query)
+        {
+            return query.Select(item => new ApplicationViewModel
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Description = item.Description,
+                CreatedDate = item.CreatedDate,
+                RoleCount = item.Roles.Count(),
+                PermissionCount = item.Permissions.Count()
             });
         }
 
@@ -31,8 +44,8 @@ namespace STS.Services.Mappers
                 Title = item.Title,
                 Description = item.Description,
                 CreatedDate = item.CreatedDate,
-                Roles = item.Roles.ToViewModel(),
-                Permissions = item.Permissions.ToViewModel()
+                RoleCount = item.Roles.Count(),
+                PermissionCount = item.Permissions.Count()
             };
         }
     }

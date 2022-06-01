@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using STS.Common.BaseModels;
 using System.Net;
+using System.Text;
 
 namespace STS.Common.CustomExceptionMiddleware
 {

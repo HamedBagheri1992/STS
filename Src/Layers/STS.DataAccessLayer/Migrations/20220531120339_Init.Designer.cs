@@ -12,8 +12,8 @@ using STS.DataAccessLayer;
 namespace STS.DataAccessLayer.Migrations
 {
     [DbContext(typeof(STSDbContext))]
-    [Migration("20220528142745_mig_5")]
-    partial class mig_5
+    [Migration("20220531120339_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,6 +37,21 @@ namespace STS.DataAccessLayer.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("ApplicationUser");
+                });
+
+            modelBuilder.Entity("RolePermission", b =>
+                {
+                    b.Property<long>("PermissionsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RolesId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PermissionsId", "RolesId");
+
+                    b.HasIndex("RolesId");
+
+                    b.ToTable("RolePermission");
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -93,17 +108,11 @@ namespace STS.DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("ApllicationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ApplicationId")
+                    b.Property<long>("ApplicationId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("DisplayTitle")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(450)");
@@ -112,9 +121,7 @@ namespace STS.DataAccessLayer.Migrations
 
                     b.HasIndex("ApplicationId");
 
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("Title", "ApllicationId")
+                    b.HasIndex("Title", "ApplicationId")
                         .IsUnique()
                         .HasFilter("[Title] IS NOT NULL");
 
@@ -207,6 +214,23 @@ namespace STS.DataAccessLayer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RolePermission", b =>
+                {
+                    b.HasOne("STS.DataAccessLayer.Entities.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("PermissionsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_RolePermission_Permissions_PermissionsId");
+
+                    b.HasOne("STS.DataAccessLayer.Entities.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_RolePermission_Roless_RolesId");
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.HasOne("STS.DataAccessLayer.Entities.Role", null)
@@ -226,17 +250,11 @@ namespace STS.DataAccessLayer.Migrations
                 {
                     b.HasOne("STS.DataAccessLayer.Entities.Application", "Application")
                         .WithMany("Permissions")
-                        .HasForeignKey("ApplicationId");
-
-                    b.HasOne("STS.DataAccessLayer.Entities.Role", "Role")
-                        .WithMany("Permissions")
-                        .HasForeignKey("RoleId")
+                        .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Application");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("STS.DataAccessLayer.Entities.Role", b =>
@@ -255,11 +273,6 @@ namespace STS.DataAccessLayer.Migrations
                     b.Navigation("Permissions");
 
                     b.Navigation("Roles");
-                });
-
-            modelBuilder.Entity("STS.DataAccessLayer.Entities.Role", b =>
-                {
-                    b.Navigation("Permissions");
                 });
 #pragma warning restore 612, 618
         }

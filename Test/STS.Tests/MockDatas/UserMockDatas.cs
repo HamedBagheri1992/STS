@@ -5,6 +5,8 @@ using STS.DTOs.RoleModels.ViewModels;
 using System;
 using System.Collections.Generic;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.UserModels.FormModels;
+using STS.Common.Extensions;
 
 namespace STS.Tests.MockDatas
 {
@@ -18,7 +20,7 @@ namespace STS.Tests.MockDatas
                             Id = 1,
                             FirstName = "F_1",
                             LastName = "L_1",
-                            UserName = "U_1",
+                            UserName = "U1",
                             FullName = "Full_1",
                             IsActive = true,
                             IsDeleted = false,
@@ -72,7 +74,7 @@ namespace STS.Tests.MockDatas
                      Id = 1,
                      FirstName = "F_1",
                      LastName = "L_1",
-                     UserName = "U_1",
+                     UserName = "U1",
                      FullName = "F_1 L_1",
                      IsActive = true,
                      IsDeleted = false,
@@ -124,13 +126,13 @@ namespace STS.Tests.MockDatas
                     Id = 1,
                     FirstName = "F_1",
                     LastName = "L_1",
-                    UserName = "U_1",
+                    UserName = "U1",
                     IsActive = true,
                     IsDeleted = false,
                     LastLogin = null,
                     CreatedDate = DateTime.Now,
                     ModifiedDate= DateTime.Now,
-                    Password = string.Empty
+                    Password = "123".ToHashPassword()
                 },
                 new User
                 {
@@ -143,7 +145,7 @@ namespace STS.Tests.MockDatas
                     LastLogin = null,
                     CreatedDate = DateTime.Now,
                     ModifiedDate= DateTime.Now,
-                    Password = string.Empty
+                    Password = "123".ToHashPassword()
                 },
                 new User
                 {
@@ -156,7 +158,7 @@ namespace STS.Tests.MockDatas
                     LastLogin = null,
                     CreatedDate = DateTime.Now,
                     ModifiedDate= DateTime.Now,
-                    Password = string.Empty
+                    Password = "123".ToHashPassword()
                 }
             };
         }
@@ -168,7 +170,7 @@ namespace STS.Tests.MockDatas
                 Id = 1,
                 FirstName = "F_1",
                 LastName = "L_1",
-                UserName = "U_1",
+                UserName = "U1",
                 FullName = "F_1 L_1",
                 IsActive = true,
                 IsDeleted = false,
@@ -179,5 +181,57 @@ namespace STS.Tests.MockDatas
                 Applications = new List<ApplicationViewModel>()
             };
         }
+
+        public static UserViewModel UserSingleViewModel(AddUserFormModel formModel)
+        {
+            return new UserViewModel
+            {
+                Id = 1,
+                FirstName = formModel.FirstName,
+                LastName = formModel.LastName,
+                UserName = formModel.UserName,
+                FullName = $"{formModel.FirstName} {formModel.LastName}",
+                IsActive = formModel.IsActive,
+                IsDeleted = false,
+                LastLogin = DateTime.Now,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now,
+                Roles = new List<RoleViewModel>(),
+                Applications = new List<ApplicationViewModel>()
+            };
+        }
+
+        public static AddUserFormModel AddFormModel()
+        {
+            return new AddUserFormModel { FirstName = "F_1", LastName = "L_1", UserName = "U1", Password = "123".ToHashPassword(), IsActive = false };
+        }
+
+        public static UpdateUserFormModel UpdateFormModel()
+        {
+            return new UpdateUserFormModel { Id = 1, FirstName = "F_1", LastName = "L_1", UserName = "U1", Password = "123".ToHashPassword(), IsActive = false };
+        }
+
+        public static ChangePasswordFormModel changePasswordFormModel(string oldpass = "123", string newpass = "321")
+        {
+            return new ChangePasswordFormModel { Id = 1, oldPassword = oldpass, NewPassword = newpass };
+        }
+
+        public static User EntityModel()
+        {
+            return new User
+            {
+                Id = 1,
+                FirstName = "F_1",
+                LastName = "L_1",
+                UserName = "U1",
+                Password = "123".ToHashPassword(),
+                IsActive = false,
+                IsDeleted = false,
+                LastLogin = DateTime.Now,
+                ModifiedDate = DateTime.Now,
+                CreatedDate = DateTime.Now
+            };
+        }
+
     }
 }

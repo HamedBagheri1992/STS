@@ -22,12 +22,12 @@ namespace STS.Services.Impls
         {
             try
             {
-                var applications = _context.Applications.Include(a => a.Permissions).Include(a => a.Roles).OrderBy(a => a.Id).ToViewModel();
+                var applications = _context.Applications.OrderBy(a => a.Id).ToViewModel();
                 return await applications.ToPagedListAsync<ApplicationViewModel>(pagination.PageNumber, pagination.PageSize);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : GetError");
+                throw new Exception("ApplicationService : GetError", ex);
             }
         }
 
@@ -38,9 +38,9 @@ namespace STS.Services.Impls
                 var application = await _context.Applications.Include(a => a.Permissions).Include(a => a.Roles).FirstOrDefaultAsync(a => a.Id == id);
                 return application?.ToViewModel();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : Get(id)Error");
+                throw new Exception("ApplicationService : Get(id)Error", ex);
             }
         }
 
@@ -61,9 +61,9 @@ namespace STS.Services.Impls
 
                 return application.Id;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : AddError");
+                throw new Exception("ApplicationService : AddError", ex);
             }
         }
 
@@ -83,9 +83,9 @@ namespace STS.Services.Impls
 
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : UpdateError");
+                throw new Exception("ApplicationService : UpdateError", ex);
             }
         }
 
@@ -100,9 +100,9 @@ namespace STS.Services.Impls
                 _context.Applications.Remove(application);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : DeleteError");
+                throw new Exception("ApplicationService : DeleteError", ex);
             }
         }
 
@@ -112,10 +112,15 @@ namespace STS.Services.Impls
             {
                 return await _context.Applications.AnyAsync(a => a.Id == id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : IsExistError");
+                throw new Exception("ApplicationService : IsExistError", ex);
             }
+        }
+
+        public Task<bool> IsExistAsync(long id, Guid secretKey)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<bool> IsTitleDuplicateAsync(string title)
@@ -124,9 +129,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Applications.AnyAsync(a => a.Title == title);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : IsTitleDuplicate(title)Error");
+                throw new Exception("ApplicationService : IsTitleDuplicate(title)Error", ex);
             }
         }
 
@@ -136,9 +141,9 @@ namespace STS.Services.Impls
             {
                 return await _context.Applications.AnyAsync(a => a.Id != id && a.Title == title);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("ApplicationService : IsTitleDuplicate(id,title)Error");
+                throw new Exception("ApplicationService : IsTitleDuplicate(id,title)Error", ex);
             }
         }
     }

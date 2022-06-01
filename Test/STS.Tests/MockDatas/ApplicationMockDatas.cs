@@ -23,8 +23,8 @@ namespace STS.Tests.MockDatas
                             Title = "App_1",
                             Description = string.Empty,
                             CreatedDate = DateTime.Now,
-                            Roles= new List<RoleViewModel>(),
-                            Permissions = new List<PermissionViewModel>()
+                            RoleCount= 0,
+                            PermissionCount = 0
                         },
                         new ApplicationViewModel
                         {
@@ -32,8 +32,8 @@ namespace STS.Tests.MockDatas
                            Title = "App_2",
                            Description = string.Empty,
                            CreatedDate = DateTime.Now,
-                           Roles= new List<RoleViewModel>(),
-                           Permissions = new List<PermissionViewModel>()
+                           RoleCount= 0,
+                            PermissionCount = 0
                         },
                         new ApplicationViewModel
                         {
@@ -41,8 +41,8 @@ namespace STS.Tests.MockDatas
                             Title = "App_3",
                             Description = string.Empty,
                             CreatedDate = DateTime.Now,
-                            Roles= new List<RoleViewModel>(),
-                            Permissions = new List<PermissionViewModel>()
+                            RoleCount= 0,
+                            PermissionCount = 0
                         }
                 };
 
@@ -59,8 +59,8 @@ namespace STS.Tests.MockDatas
                     Title = "App_1",
                     Description = string.Empty,
                     CreatedDate = DateTime.Now,
-                    Roles= new List<RoleViewModel>(),
-                    Permissions = new List<PermissionViewModel>()
+                    RoleCount= 0,
+                    PermissionCount = 0
                 },
                 new ApplicationViewModel
                 {
@@ -68,8 +68,8 @@ namespace STS.Tests.MockDatas
                    Title = "App_2",
                    Description = string.Empty,
                    CreatedDate = DateTime.Now,
-                   Roles= new List<RoleViewModel>(),
-                   Permissions = new List<PermissionViewModel>()
+                   RoleCount= 0,
+                   PermissionCount = 0
                 },
                 new ApplicationViewModel
                 {
@@ -77,8 +77,8 @@ namespace STS.Tests.MockDatas
                     Title = "App_3",
                     Description = string.Empty,
                     CreatedDate = DateTime.Now,
-                    Roles= new List<RoleViewModel>(),
-                    Permissions = new List<PermissionViewModel>()
+                    RoleCount= 0,
+                    PermissionCount = 0
                 }
             };
         }
@@ -122,8 +122,8 @@ namespace STS.Tests.MockDatas
                 Title = "App_1",
                 Description = string.Empty,
                 CreatedDate = DateTime.Now,
-                Roles = new List<RoleViewModel>(),
-                Permissions = new List<PermissionViewModel>()
+                RoleCount = 0,
+                PermissionCount = 0
             };
         }
         public static ApplicationViewModel ApplicationSingleViewModel(AddApplicationFormModel formModel)

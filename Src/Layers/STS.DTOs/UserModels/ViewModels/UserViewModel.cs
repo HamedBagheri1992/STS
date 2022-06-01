@@ -25,7 +25,7 @@ namespace STS.DTOs.UserModels.ViewModels
         public DateTime ModifiedDate { get; set; }
 
 
-        public List<ApplicationViewModel> Applications { get; set; }
-        public List<RoleViewModel> Roles { get; set; }
+        public IEnumerable<ApplicationViewModel> Applications { get; set; }
+        public IEnumerable<RoleViewModel> Roles { get; set; }
     }
 }

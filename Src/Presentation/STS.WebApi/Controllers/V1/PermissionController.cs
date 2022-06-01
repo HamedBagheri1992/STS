@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
 using STS.Interfaces.Contracts;
@@ -8,15 +9,18 @@ namespace STS.WebApi.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(Roles = "STS-Permission")]
     public class PermissionController : BaseController
     {
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
+        private readonly IApplicationService _applicationService;
 
-        public PermissionController(IPermissionService permissionService, IRoleService roleService)
+        public PermissionController(IPermissionService permissionService, IRoleService roleService, IApplicationService applicationService)
         {
             _permissionService = permissionService;
             _roleService = roleService;
+            _applicationService = applicationService;
         }
 
         [HttpGet("{roleId}")]
@@ -26,36 +30,35 @@ namespace STS.WebApi.Controllers.V1
             return Ok(permissions);
         }
 
-        [HttpGet("{roleId}/{permissionId}")]
-        public async Task<ActionResult<PermissionViewModel>> Get(long roleId, long permissionId)
+        [HttpGet("{applicationId}/{permissionId}")]
+        public async Task<ActionResult<PermissionViewModel>> Get(long applicationId, long permissionId)
         {
-            var permission = await _permissionService.GetAsync(roleId, permissionId);
+            var permission = await _permissionService.GetAsync(applicationId, permissionId);
             return Ok(permission);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(AddPermissionFormModel addFormModel)
         {
-            if (!await _roleService.IsExistAsync(addFormModel.RoleId))
-                return BadError("RoleId is Invalid");
+            if (!await _applicationService.IsExistAsync(addFormModel.ApplicationId))
+                return BadError("Application is Invalid");
 
             if (await _permissionService.IsTitleDuplicateAsync(addFormModel.Title))
                 return BadError("Permission Title is Duplicate");
 
             long permissionId = await _permissionService.AddAsync(addFormModel);
 
-            var addedPermission = await _permissionService.GetAsync(addFormModel.RoleId, permissionId);
+            var addedPermission = await _permissionService.GetAsync(addFormModel.ApplicationId, permissionId);
             if (addedPermission is null)
                 return NotError("Permission Added Problem");
-
-            return CreatedAtAction(nameof(Get), new { roleId = addedPermission.RoleId, permissionId = addedPermission.Id }, addedPermission);
+            return CreatedAtAction(nameof(Get), new { applicationId = addedPermission.ApplicationId, permissionId = addedPermission.Id }, addedPermission);
         }
 
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] UpdatePermissionFormModel updateFormModel)
         {
-            if (!await _roleService.IsExistAsync(updateFormModel.RoleId))
-                return BadError("RoleId is Invalid");
+            if (!await _applicationService.IsExistAsync(updateFormModel.ApplicationId))
+                return BadError("ApplicationId is Invalid");
 
             if (!await _permissionService.IsPermissionValidAsync(updateFormModel.Id))
                 return BadError("Permission is Invalid");

@@ -9,8 +9,7 @@ namespace STS.DTOs.ApplicationModels.ViewModels
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
-
-        public IEnumerable<RoleViewModel> Roles { get; set; }
-        public IEnumerable<PermissionViewModel> Permissions { get; set; }
+        public int RoleCount { get; set; }
+        public int PermissionCount { get; set; }
     }
 }
