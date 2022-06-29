@@ -12,7 +12,9 @@ namespace STS.Services.Mappers
                 Id = item.Id,
                 ApplicationId = item.ApplicationId,
                 DisplayTitle = item.DisplayTitle,
-                Title = item.Title
+                Title = item.Title,
+                CategoryId = item.CategoryId,
+                CategoryTitle = item.CategoryId.HasValue ? item.Category.Title : string.Empty
             });
         }
 
@@ -23,7 +25,9 @@ namespace STS.Services.Mappers
                 Id = item.Id,
                 ApplicationId = item.ApplicationId,
                 DisplayTitle = item.DisplayTitle,
-                Title = item.Title
+                Title = item.Title,
+                CategoryId = item.CategoryId,
+                CategoryTitle = item.CategoryId.HasValue ? item.Category.Title : string.Empty
             });
         }
 
@@ -34,7 +38,9 @@ namespace STS.Services.Mappers
                 Id = item.Id,
                 ApplicationId = item.ApplicationId,
                 DisplayTitle = item.DisplayTitle,
-                Title = item.Title
+                Title = item.Title,
+                CategoryId = item.CategoryId,
+                CategoryTitle = item.CategoryId.HasValue ? item.Category.Title : string.Empty
             };
         }
     }

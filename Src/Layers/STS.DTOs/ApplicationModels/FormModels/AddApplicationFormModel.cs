@@ -12,6 +12,9 @@ namespace STS.DTOs.ApplicationModels.FormModels
         [Required]
         public string Title { get; set; }
 
+        [Required]
+        public int ExpirationDuration { get; set; }
+
         public string Description { get; set; }
     }
 }

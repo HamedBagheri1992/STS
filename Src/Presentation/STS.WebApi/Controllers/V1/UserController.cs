@@ -42,8 +42,11 @@ namespace STS.WebApi.Controllers.V1
             if (string.IsNullOrEmpty(addFormModel.Password))
                 return BadError("Password is required");
 
+            if (addFormModel.ExpirationDate.HasValue && addFormModel.ExpirationDate.Value < DateTime.Now)
+                return BadError("ExpirationDate is Invalid");
+
             if (addFormModel.UserName.HasSpecialChars())
-                return BadError("UserName must be Digit and Letter");
+                return BadError("UserName must be empty of space");
 
             if (await _userService.IsUserNameDuplicateAsync(addFormModel.UserName))
                 return BadError("UserName is Duplicate");
@@ -57,12 +60,14 @@ namespace STS.WebApi.Controllers.V1
             return CreatedAtAction(nameof(Get), new { userId = addedUser.Id }, addedUser);
         }
 
-
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] UpdateUserFormModel updateFormModel)
         {
             if (updateFormModel.UserName.HasSpecialChars())
-                return BadError("UserName must be Digit and Letter");
+                return BadError("UserName must be empty of space");
+
+            if (updateFormModel.ExpirationDate.HasValue && updateFormModel.ExpirationDate.Value < DateTime.Now)
+                return BadError("ExpirationDate is Invalid");
 
             if (!await _userService.IsExistAsync(updateFormModel.Id))
                 return BadError("User is Invalid");
@@ -75,7 +80,6 @@ namespace STS.WebApi.Controllers.V1
             return NoContent();
         }
 
-
         [HttpPut("[action]")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordFormModel changePasswordFormModel)
         {
@@ -86,15 +90,5 @@ namespace STS.WebApi.Controllers.V1
             return NoContent();
         }
 
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] long id)
-        {
-            if (!await _userService.IsExistAsync(id))
-                return BadError("User is Invalid");
-
-            await _userService.DeleteAsync(id);
-            return NoContent();
-        }
     }
 }

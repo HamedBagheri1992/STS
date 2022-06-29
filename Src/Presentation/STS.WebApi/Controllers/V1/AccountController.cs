@@ -12,27 +12,29 @@ namespace STS.WebApi.Controllers.V1
     public class AccountController : BaseController
     {
         private readonly IAccountService _accountService;
-        private readonly IRoleService _roleService;
-
-        public AccountController(IAccountService accountService, IRoleService roleService)
+       
+        public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
-            _roleService = roleService;
         }
 
         [HttpPost("[action]")]
         public async Task<ActionResult<LoginViewModel>> Login([FromBody] LoginFormModel formModel)
         {
-            UserViewModel user = await _accountService.LoginAsync(formModel);
+            var userIdentity = await _accountService.LoginAsync(formModel);
 
-            if (user is null)
-                return BadError("UserName or Password is Invalid");
+            if (userIdentity is null)
+                return NotError("UserName or Password is Invalid");
 
-            var permissions = (await _roleService.GetAsync(formModel.AppId)).SelectMany(r => r.Permissions).Distinct().ToList();
+            if (!userIdentity.IsActive)
+                return BadError("User is Deactive.");
 
-            string token = _accountService.GenerateToken(user, permissions);
+            if (userIdentity.ExpirationDate.HasValue && userIdentity.ExpirationDate.Value < DateTime.Now)
+                return BadError("User has expired, Please call the administrator.");
 
-            await _accountService.UpdateLastLoginAsync(user);
+            string token = _accountService.GenerateToken(userIdentity);
+
+            await _accountService.UpdateLastLoginAsync(userIdentity);
 
             return Ok(new LoginViewModel { AccessToken = token, RefreshToken = string.Empty });
         }

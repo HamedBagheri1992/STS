@@ -12,5 +12,7 @@ namespace STS.DTOs.PermissionModels.ViewModels
         public long ApplicationId { get; set; }
         public string Title { get; set; }
         public string DisplayTitle { get; set; }
+        public long? CategoryId { get; set; }
+        public string CategoryTitle { get; set; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using STS.Common.BaseModels;
 using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
 using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
+using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
 using STS.Services.Mappers;
 
@@ -23,8 +25,10 @@ namespace STS.Services.Impls
             {
                 var permission = new Permission
                 {
+                    ApplicationId = addFormModel.ApplicationId,
                     DisplayTitle = addFormModel.DisplayTitle,
-                    Title = addFormModel.Title
+                    Title = addFormModel.Title,
+                    CategoryId = addFormModel.CategoryId
                 };
 
                 await _context.Permissions.AddAsync(permission);
@@ -39,11 +43,12 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task<List<PermissionViewModel>> GetAsync(long applicationId)
+        public async Task<PaginatedResult<PermissionViewModel>> GetAsync(long applicationId, PaginationParam pagination)
         {
             try
             {
-                return await _context.Permissions.Include(p => p.Roles).Where(r => r.ApplicationId == applicationId).ToViewModel().ToListAsync();
+                var permissions = _context.Permissions.Include(p => p.Roles).Include(p => p.Category).Where(r => r.ApplicationId == applicationId).ToViewModel();
+                return await permissions.ToPagedListAsync<PermissionViewModel>(pagination.PageNumber, pagination.PageSize);
             }
             catch (Exception ex)
             {
@@ -55,7 +60,7 @@ namespace STS.Services.Impls
         {
             try
             {
-                var permission = await _context.Permissions.Include(p => p.Roles).FirstOrDefaultAsync(p => p.Id == permissionId && p.ApplicationId == applicationId);
+                var permission = await _context.Permissions.Include(p => p.Roles).Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == permissionId && p.ApplicationId == applicationId);
                 return permission?.ToViewModel();
             }
             catch (Exception ex)
@@ -70,7 +75,7 @@ namespace STS.Services.Impls
             {
                 var permission = await _context.Permissions.FindAsync(updateFormModel.Id);
                 if (permission is null)
-                    throw new Exception("PermissionService : Permission is Invalid");
+                    throw new STSException("PermissionService : Permission is Invalid");
 
                 if (permission.Title != updateFormModel.Title)
                     permission.Title = updateFormModel.Title;
@@ -81,11 +86,44 @@ namespace STS.Services.Impls
                 if (permission.ApplicationId != updateFormModel.ApplicationId)
                     permission.ApplicationId = updateFormModel.ApplicationId;
 
+                if (permission.CategoryId != updateFormModel.CategoryId)
+                    permission.CategoryId = updateFormModel.CategoryId;
+
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
                 throw new Exception("PermissionService : UpdateError", ex);
+            }
+        }
+
+        public async Task UpdatePermissionCategoryAsync(UpdatePermissionCategoryFormModel updateFormModel)
+        {
+            try
+            {
+                var permissions = _context.Permissions.Where(p => updateFormModel.PermissionIds.Contains(p.Id)).ToList();
+                if (permissions.Count != updateFormModel.PermissionIds.Count)
+                    throw new STSException("Some of the Permissions are invalid");
+
+                if (permissions.GroupBy(x => x.ApplicationId).Count() > 1)
+                    throw new STSException("Permission are not in an Application");
+
+                var permissionRange = permissions.Select(x => new Permission { Id = x.Id, Title = x.Title, DisplayTitle = x.DisplayTitle, ApplicationId = x.ApplicationId, CategoryId = updateFormModel.CategoryId }).ToList();
+
+                _context.Permissions.UpdateRange(permissionRange);
+                await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("PermissionService : AddPermissionCategoryError", ex);
             }
         }
 
@@ -95,10 +133,14 @@ namespace STS.Services.Impls
             {
                 var permission = await _context.Permissions.FindAsync(id);
                 if (permission is null)
-                    throw new Exception("PermissionService : Permission is Invalid");
+                    throw new STSException("PermissionService : Permission is Invalid");
 
                 _context.Permissions.Remove(permission);
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
@@ -118,27 +160,27 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task<bool> IsTitleDuplicateAsync(string title)
+        public async Task<bool> IsTitleDuplicateAsync(long applicationId, string title)
         {
             try
             {
-                return await _context.Permissions.AnyAsync(p => p.Title == title);
+                return await _context.Permissions.AnyAsync(p => p.Title == title && p.ApplicationId == applicationId);
             }
             catch (Exception ex)
             {
-                throw new Exception("PermissionService : IsTitleDuplicate(title)Error", ex);
+                throw new Exception("PermissionService : IsTitleDuplicate(applicationId,title)Error", ex);
             }
         }
 
-        public async Task<bool> IsTitleDuplicateAsync(long permissionId, string title)
+        public async Task<bool> IsTitleDuplicateAsync(long applicationId, long permissionId, string title)
         {
             try
             {
-                return await _context.Permissions.AnyAsync(p => p.Title == title && p.Id != permissionId);
+                return await _context.Permissions.AnyAsync(p => p.Title == title && p.ApplicationId == applicationId && p.Id != permissionId);
             }
             catch (Exception ex)
             {
-                throw new Exception("PermissionService : IsTitleDuplicate(permissionId,title)Error", ex);
+                throw new Exception("PermissionService : IsTitleDuplicate(applicationId,permissionId,title)Error", ex);
             }
         }
     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace STS.DataAccessLayer.Entities
 {
@@ -18,9 +13,15 @@ namespace STS.DataAccessLayer.Entities
         public long ApplicationId { get; set; }
         public string Title { get; set; }
         public string DisplayTitle { get; set; }
+        public long? CategoryId { get; set; }
+
+
 
         [ForeignKey("ApplicationId")]
         public virtual Application Application { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; }
 
         public virtual ICollection<Role> Roles { get; set; }
 

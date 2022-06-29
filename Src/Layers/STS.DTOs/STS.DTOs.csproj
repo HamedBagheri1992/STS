@@ -6,4 +6,8 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\STS.Common\STS.Common.csproj" />
+  </ItemGroup>
+
 </Project>

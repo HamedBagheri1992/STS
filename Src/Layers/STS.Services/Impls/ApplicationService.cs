@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using STS.Common.BaseModels;
 using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
 using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.BaseModels;
 using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
 using STS.Services.Mappers;
@@ -44,6 +46,18 @@ namespace STS.Services.Impls
             }
         }
 
+        public async Task<List<SelectItemListModel>> GetItemListAsync()
+        {
+            try
+            {
+                return await _context.Applications.ToSelectItemList().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ApplicationService : GetItemListError", ex);
+            }
+        }
+
         public async Task<long> AddAsync(AddApplicationFormModel addFormModel)
         {
             try
@@ -51,6 +65,7 @@ namespace STS.Services.Impls
                 var application = new Application
                 {
                     Title = addFormModel.Title,
+                    ExpirationDuration = addFormModel.ExpirationDuration,
                     SecretKey = Guid.NewGuid(),
                     Description = addFormModel.Description,
                     CreatedDate = DateTime.Now
@@ -73,15 +88,22 @@ namespace STS.Services.Impls
             {
                 var application = await _context.Applications.FindAsync(updateFormModel.Id);
                 if (application is null)
-                    throw new Exception("ApplicationService : Application is Invalid");
+                    throw new STSException("ApplicationService : Application is Invalid");
 
                 if (application.Title != updateFormModel.Title)
                     application.Title = updateFormModel.Title;
+
+                if (application.ExpirationDuration != updateFormModel.ExpirationDuration)
+                    application.ExpirationDuration = updateFormModel.ExpirationDuration;
 
                 if (application.Description != updateFormModel.Description)
                     application.Description = updateFormModel.Description;
 
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
@@ -95,10 +117,14 @@ namespace STS.Services.Impls
             {
                 var application = await _context.Applications.FindAsync(id);
                 if (application is null)
-                    throw new Exception("ApplicationService : Application is Invalid");
+                    throw new STSException("ApplicationService : Application is Invalid");
 
                 _context.Applications.Remove(application);
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
@@ -116,11 +142,6 @@ namespace STS.Services.Impls
             {
                 throw new Exception("ApplicationService : IsExistError", ex);
             }
-        }
-
-        public Task<bool> IsExistAsync(long id, Guid secretKey)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<bool> IsTitleDuplicateAsync(string title)

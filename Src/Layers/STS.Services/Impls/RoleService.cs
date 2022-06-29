@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using STS.Common.BaseModels;
 using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
+using STS.DTOs.ResultModels;
 using STS.DTOs.RoleModels.FormModels;
 using STS.DTOs.RoleModels.ViewModels;
 using STS.Interfaces.Contracts;
+using STS.Services.Helper;
 using STS.Services.Mappers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace STS.Services.Impls
 {
@@ -22,12 +21,24 @@ namespace STS.Services.Impls
             _context = context;
         }
 
+        public async Task<PaginatedResult<RoleViewModel>> GetAsync(long applicationId, PaginationParam pagination)
+        {
+            try
+            {
+                var roles = _context.Roles.Where(x => x.ApplicationId == applicationId).Include(r => r.Application).Include(r => r.Permissions).ThenInclude(c => c.Category).ToViewModel();
+                return await roles.ToPagedListAsync<RoleViewModel>(pagination.PageNumber, pagination.PageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RoleService : Get(applicationId)Error", ex);
+            }
+        }
+
         public async Task<List<RoleViewModel>> GetAsync(long applicationId)
         {
             try
             {
-                var roles = _context.Roles.Where(x => x.ApplicationId == applicationId).Include(r => r.Application).Include(r => r.Permissions).AsQueryable();
-                return await roles.ToViewModel().ToListAsync();
+                return await _context.Roles.Where(x => x.ApplicationId == applicationId).Include(r => r.Application).Include(r => r.Permissions).ThenInclude(c => c.Category).ToViewModel().ToListAsync();
             }
             catch (Exception ex)
             {
@@ -39,7 +50,7 @@ namespace STS.Services.Impls
         {
             try
             {
-                var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions)
+                var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions).ThenInclude(c => c.Category)
                     .FirstOrDefaultAsync(x => x.ApplicationId == applicationId && x.Id == roleId);
                 return role?.ToViewModel();
             }
@@ -53,7 +64,7 @@ namespace STS.Services.Impls
         {
             try
             {
-                var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions).FirstOrDefaultAsync(x => x.Id == id);
+                var role = await _context.Roles.Include(r => r.Application).Include(r => r.Permissions).ThenInclude(c => c.Category).FirstOrDefaultAsync(x => x.Id == id);
                 return role?.ToViewModel();
             }
             catch (Exception ex)
@@ -90,7 +101,7 @@ namespace STS.Services.Impls
             {
                 var role = await _context.Roles.FindAsync(updateFormModel.Id);
                 if (role is null)
-                    throw new Exception("RoleService : Role is Invalid");
+                    throw new STSException("RoleService : Role is Invalid");
 
                 if (role.Caption != updateFormModel.Caption)
                     role.Caption = updateFormModel.Caption;
@@ -100,9 +111,50 @@ namespace STS.Services.Impls
 
                 await _context.SaveChangesAsync();
             }
+            catch (STSException ex)
+            {
+                throw ex;
+            }
             catch (Exception ex)
             {
                 throw new Exception("RoleService : UpdateError", ex);
+            }
+        }
+
+        public async Task UpdateRolePermissionAsync(UpdateRolePermissionFormModel updateRolePermissionFormModel)
+        {
+            try
+            {
+                var role = await _context.Roles.Include(r => r.Permissions).ThenInclude(c => c.Category).FirstOrDefaultAsync(r => r.Id == updateRolePermissionFormModel.RoleId);
+                if (role is null)
+                    throw new STSException("RoleService : Role is Invalid");
+
+                var permissions = await _context.Permissions.Where(p => updateRolePermissionFormModel.PermissionIds.Contains(p.Id)).ToListAsync();
+                if (permissions.Count != updateRolePermissionFormModel.PermissionIds.Count)
+                    throw new STSException("Some PermissionIds are Invalid.");
+
+
+                if (permissions.GroupBy(p => p.ApplicationId).Count() > 1)
+                    throw new STSException("permissions are not in a same Application.");
+
+                role.GetConsistency(updateRolePermissionFormModel, out List<Permission> deletePermissions, out List<long> addPermissionId);
+
+                var addPermission = await _context.Permissions.Where(p => addPermissionId.Contains(p.Id)).ToListAsync();
+                if (addPermissionId.Count != addPermission.Count)
+                    throw new STSException("Some PermissionIds are Invalid.");
+
+                role.Permissions.AddRange(addPermission);
+                role.Permissions.RemoveRange(deletePermissions);
+
+                await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("RoleService : UpdateRolePermissionError", ex);
             }
         }
 
@@ -112,10 +164,14 @@ namespace STS.Services.Impls
             {
                 var role = await _context.Roles.FindAsync(id);
                 if (role is null)
-                    throw new Exception("RoleService : Role is Invalid");
+                    throw new STSException("RoleService : Role is Invalid");
 
                 _context.Roles.Remove(role);
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
@@ -123,11 +179,11 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task<bool> IsCaptionDuplicateAsync(string caption)
+        public async Task<bool> IsCaptionDuplicateAsync(long applicationId, string caption)
         {
             try
             {
-                return await _context.Roles.AnyAsync(r => r.Caption == caption);
+                return await _context.Roles.AnyAsync(r => r.Caption == caption && r.ApplicationId == applicationId);
             }
             catch (Exception ex)
             {
@@ -135,11 +191,11 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task<bool> IsCaptionDuplicateAsync(long id, string caption)
+        public async Task<bool> IsCaptionDuplicateAsync(long applicationId, long id, string caption)
         {
             try
             {
-                return await _context.Roles.AnyAsync(r => r.Id != id && r.Caption == caption);
+                return await _context.Roles.AnyAsync(r => r.Id != id && r.Caption == caption && r.ApplicationId == applicationId);
             }
             catch (Exception ex)
             {
@@ -170,5 +226,6 @@ namespace STS.Services.Impls
                 throw new Exception("RoleService : IsRoleValidError", ex);
             }
         }
+
     }
 }

@@ -15,8 +15,7 @@ namespace STS.Interfaces.Contracts
         Task<PaginatedResult<UserViewModel>> GetAsync(PaginationParam pagination);
         Task<UserViewModel?> GetAsync(long id);
         Task<long> AddAsync(AddUserFormModel addFormModel);
-        Task UpdateAsync(UpdateUserFormModel updateFormModel);
-        Task DeleteAsync(long id);
+        Task UpdateAsync(UpdateUserFormModel updateFormModel);        
         Task ChangePasswordAsync(ChangePasswordFormModel changePasswordFormModel);
 
 

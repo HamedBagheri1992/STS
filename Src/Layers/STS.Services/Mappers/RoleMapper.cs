@@ -1,4 +1,6 @@
-﻿using STS.DataAccessLayer.Entities;
+﻿using STS.Common.BaseModels;
+using STS.DataAccessLayer.Entities;
+using STS.DTOs.RoleModels.FormModels;
 using STS.DTOs.RoleModels.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -22,7 +24,6 @@ namespace STS.Services.Mappers
             });
         }
 
-
         public static IEnumerable<RoleViewModel> ToViewModel(this IEnumerable<Role> query)
         {
             return query.Select(item => new RoleViewModel
@@ -45,6 +46,12 @@ namespace STS.Services.Mappers
                 ApplicationId = item.Application.Id,
                 Permissions = item.Permissions.ToViewModel()
             };
+        }
+
+        public static void GetConsistency(this Role role, UpdateRolePermissionFormModel updateRolePermissionFormModel, out List<Permission> deletePermissions, out List<long> addPermissionId)
+        {
+            deletePermissions = role.Permissions.Where(p => updateRolePermissionFormModel.PermissionIds.All(u => u != p.Id)).ToList();
+            addPermissionId = updateRolePermissionFormModel.PermissionIds.Where(u => role.Permissions.All(p => p.Id != u)).ToList();
         }
     }
 }

@@ -37,7 +37,6 @@ namespace STS.Services.ServiceSetups
                                 FirstName = "Admin",
                                 LastName = "System",
                                 IsActive = true,
-                                IsDeleted = false,
                                 CreatedDate = DateTime.Now,
                                 ModifiedDate = DateTime.Now,
                                 Applications = new List<Application>() { application },

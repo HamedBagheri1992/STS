@@ -17,5 +17,7 @@ namespace STS.DTOs.PermissionModels.FormModels
 
         [Required]
         public long ApplicationId { get; set; }
+
+        public long? CategoryId { get; set; }
     }
 }

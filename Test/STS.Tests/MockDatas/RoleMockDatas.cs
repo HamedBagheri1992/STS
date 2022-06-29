@@ -1,5 +1,6 @@
 ﻿using STS.DataAccessLayer.Entities;
 using STS.DTOs.PermissionModels.ViewModels;
+using STS.DTOs.ResultModels;
 using STS.DTOs.RoleModels.FormModels;
 using STS.DTOs.RoleModels.ViewModels;
 using System;
@@ -12,6 +13,39 @@ namespace STS.Tests.MockDatas
 {
     public static class RoleMockDatas
     {
+        public static PaginatedResult<RoleViewModel> RolePagedCollectionViewModels(PaginationParam pagination)
+        {
+            var Items = new List<RoleViewModel>
+            {
+                new RoleViewModel
+                {
+                    Id = 1,
+                    Caption = "Role_1",
+                    ApplicationId = 1,
+                    ApplicationTitle ="App_1",
+                    Permissions = new List<PermissionViewModel>()
+                },
+                new RoleViewModel
+                {
+                     Id = 2,
+                    Caption = "Role_2",
+                    ApplicationId = 1,
+                    ApplicationTitle ="App_1",
+                    Permissions = new List<PermissionViewModel>()
+                },
+                new RoleViewModel
+                {
+                    Id = 3,
+                    Caption = "Role_3",
+                    ApplicationId = 1,
+                    ApplicationTitle ="App_1",
+                    Permissions = new List<PermissionViewModel>()
+                }
+            };
+
+            return new PaginatedResult<RoleViewModel>(Items, 3, pagination.PageNumber, pagination.PageSize);
+        }
+
         public static List<RoleViewModel> RoleCollectionViewModels()
         {
             return new List<RoleViewModel>
@@ -82,6 +116,11 @@ namespace STS.Tests.MockDatas
                 ApplicationTitle = "App_1",
                 Permissions = new List<PermissionViewModel>()
             };
+        }
+
+        public static UpdateRolePermissionFormModel GetUpdateRolePermissionFormModel()
+        {
+            return new UpdateRolePermissionFormModel { RoleId = 1, PermissionIds = new List<long> { 1, 2, 3, 4 } };
         }
         public static RoleViewModel RoleSingleViewModel(AddRoleFormModel formModel)
         {

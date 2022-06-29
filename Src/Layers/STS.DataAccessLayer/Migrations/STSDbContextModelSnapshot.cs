@@ -22,6 +22,21 @@ namespace STS.DataAccessLayer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("ApplicationOrganization", b =>
+                {
+                    b.Property<long>("ApplicationsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("OrganizationsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ApplicationsId", "OrganizationsId");
+
+                    b.HasIndex("OrganizationsId");
+
+                    b.ToTable("ApplicationOrganization");
+                });
+
             modelBuilder.Entity("ApplicationUser", b =>
                 {
                     b.Property<long>("ApplicationsId")
@@ -35,6 +50,21 @@ namespace STS.DataAccessLayer.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("ApplicationUser");
+                });
+
+            modelBuilder.Entity("OrganizationUser", b =>
+                {
+                    b.Property<long>("OrganizationsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UsersId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("OrganizationsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("OrganizationUser");
                 });
 
             modelBuilder.Entity("RolePermission", b =>
@@ -81,6 +111,9 @@ namespace STS.DataAccessLayer.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ExpirationDuration")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("SecretKey")
                         .HasColumnType("uniqueidentifier");
 
@@ -98,6 +131,56 @@ namespace STS.DataAccessLayer.Migrations
                     b.ToTable("Application");
                 });
 
+            modelBuilder.Entity("STS.DataAccessLayer.Entities.Category", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("ApplicationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId", "Title")
+                        .IsUnique()
+                        .HasFilter("[Title] IS NOT NULL");
+
+                    b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("STS.DataAccessLayer.Entities.Organization", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Tag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Organization");
+                });
+
             modelBuilder.Entity("STS.DataAccessLayer.Entities.Permission", b =>
                 {
                     b.Property<long>("Id")
@@ -109,6 +192,9 @@ namespace STS.DataAccessLayer.Migrations
                     b.Property<long>("ApplicationId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("CategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("DisplayTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -118,6 +204,8 @@ namespace STS.DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationId");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("Title", "ApplicationId")
                         .IsUnique()
@@ -162,13 +250,13 @@ namespace STS.DataAccessLayer.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastLogin")
@@ -197,11 +285,41 @@ namespace STS.DataAccessLayer.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("ApplicationOrganization", b =>
+                {
+                    b.HasOne("STS.DataAccessLayer.Entities.Application", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("STS.DataAccessLayer.Entities.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ApplicationUser", b =>
                 {
                     b.HasOne("STS.DataAccessLayer.Entities.Application", null)
                         .WithMany()
                         .HasForeignKey("ApplicationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("STS.DataAccessLayer.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OrganizationUser", b =>
+                {
+                    b.HasOne("STS.DataAccessLayer.Entities.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -244,6 +362,27 @@ namespace STS.DataAccessLayer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("STS.DataAccessLayer.Entities.Category", b =>
+                {
+                    b.HasOne("STS.DataAccessLayer.Entities.Application", "Application")
+                        .WithMany("Categories")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Application");
+                });
+
+            modelBuilder.Entity("STS.DataAccessLayer.Entities.Organization", b =>
+                {
+                    b.HasOne("STS.DataAccessLayer.Entities.Organization", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("STS.DataAccessLayer.Entities.Permission", b =>
                 {
                     b.HasOne("STS.DataAccessLayer.Entities.Application", "Application")
@@ -252,7 +391,13 @@ namespace STS.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("STS.DataAccessLayer.Entities.Category", "Category")
+                        .WithMany("Permissions")
+                        .HasForeignKey("CategoryId");
+
                     b.Navigation("Application");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("STS.DataAccessLayer.Entities.Role", b =>
@@ -268,9 +413,21 @@ namespace STS.DataAccessLayer.Migrations
 
             modelBuilder.Entity("STS.DataAccessLayer.Entities.Application", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Permissions");
 
                     b.Navigation("Roles");
+                });
+
+            modelBuilder.Entity("STS.DataAccessLayer.Entities.Category", b =>
+                {
+                    b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("STS.DataAccessLayer.Entities.Organization", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

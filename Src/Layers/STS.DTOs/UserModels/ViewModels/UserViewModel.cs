@@ -1,10 +1,5 @@
 ﻿using STS.DTOs.ApplicationModels.ViewModels;
 using STS.DTOs.RoleModels.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STS.DTOs.UserModels.ViewModels
 {
@@ -18,12 +13,12 @@ namespace STS.DTOs.UserModels.ViewModels
         public string UserName { get; set; }
 
         public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         public DateTime? LastLogin { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
-
+        public IEnumerable<long> OrganizationIds { get; set; }
 
         public IEnumerable<ApplicationViewModel> Applications { get; set; }
         public IEnumerable<RoleViewModel> Roles { get; set; }

@@ -1,5 +1,6 @@
 ﻿using STS.DataAccessLayer.Entities;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.BaseModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace STS.Services.Mappers
                 Title = item.Title,
                 Description = item.Description,
                 CreatedDate = item.CreatedDate,
+                ExpirationDuration = item.ExpirationDuration,
                 RoleCount = item.Roles.Count(),
                 PermissionCount = item.Permissions.Count()
             });
@@ -31,6 +33,7 @@ namespace STS.Services.Mappers
                 Title = item.Title,
                 Description = item.Description,
                 CreatedDate = item.CreatedDate,
+                ExpirationDuration = item.ExpirationDuration,
                 RoleCount = item.Roles.Count(),
                 PermissionCount = item.Permissions.Count()
             });
@@ -44,9 +47,19 @@ namespace STS.Services.Mappers
                 Title = item.Title,
                 Description = item.Description,
                 CreatedDate = item.CreatedDate,
+                ExpirationDuration = item.ExpirationDuration,
                 RoleCount = item.Roles.Count(),
                 PermissionCount = item.Permissions.Count()
             };
+        }
+
+        public static IQueryable<SelectItemListModel> ToSelectItemList(this IQueryable<Application> query)
+        {
+            return query.Select(item => new SelectItemListModel
+            {
+                Text = item.Title,
+                Value = item.Id
+            });
         }
     }
 }

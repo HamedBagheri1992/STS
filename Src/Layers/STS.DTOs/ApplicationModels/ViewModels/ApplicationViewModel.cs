@@ -11,5 +11,6 @@ namespace STS.DTOs.ApplicationModels.ViewModels
         public DateTime CreatedDate { get; set; }
         public int RoleCount { get; set; }
         public int PermissionCount { get; set; }
+        public int ExpirationDuration { get; set; }
     }
 }

@@ -245,13 +245,14 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             string caption = "Role_Unique";
+            long applicationId = 1;
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(caption);
+            var result = await sut.IsCaptionDuplicateAsync(applicationId, caption);
 
             //Assert
             result.Should().BeFalse();
@@ -262,13 +263,14 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             string caption = "Role_1";
+            long applicationId = 1;
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(caption);
+            var result = await sut.IsCaptionDuplicateAsync(applicationId, caption);
 
             //Assert
             result.Should().BeTrue();
@@ -283,6 +285,7 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             long roleId = 1;
+            long applicationId = 1;
             string caption = "Role_Unique";
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
@@ -290,7 +293,7 @@ namespace STS.Tests.Systems.Services
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(roleId, caption);
+            var result = await sut.IsCaptionDuplicateAsync(applicationId, roleId, caption);
 
             //Assert
             result.Should().BeFalse();
@@ -302,13 +305,14 @@ namespace STS.Tests.Systems.Services
             //Arrange
             long roleId = 2;
             string caption = "Role_1";
+            long applicationId = 1;
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Roles).Returns(_mockRoleSet.Object);
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(roleId, caption);
+            var result = await sut.IsCaptionDuplicateAsync(applicationId, roleId, caption);
 
             //Assert
             result.Should().BeTrue();
@@ -320,6 +324,7 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             long roleId = 1;
+            long applicationId = 1;
             string caption = "Role_1";
 
             _mockRoleSet.IqueryableRegisteration<Role>(RoleMockDatas.RoleCollectionEntityModels().AsQueryable());
@@ -327,7 +332,7 @@ namespace STS.Tests.Systems.Services
 
             //Act
             var sut = new RoleService(_mockContext.Object);
-            var result = await sut.IsCaptionDuplicateAsync(roleId, caption);
+            var result = await sut.IsCaptionDuplicateAsync(applicationId, roleId, caption);
 
             //Assert
             result.Should().BeFalse();

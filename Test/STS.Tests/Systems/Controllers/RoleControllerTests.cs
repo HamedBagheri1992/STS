@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using STS.Common.BaseModels;
+using STS.DTOs.ResultModels;
 using STS.DTOs.RoleModels.ViewModels;
 using STS.Interfaces.Contracts;
 using STS.Tests.MockDatas;
@@ -29,10 +30,11 @@ namespace STS.Tests.Systems.Controllers
         {
             //Arrange
             int applicationId = 1;
+            var pagination = new PaginationParam() { PageNumber = 1, PageSize = 10 };
             var sut = new RoleController(_applicationService.Object, _roleService.Object);
 
             //Act
-            var actionResult = await sut.Get(applicationId);
+            var actionResult = await sut.Get(applicationId, pagination);
             var actionStatus = actionResult.Result as OkObjectResult;
 
             //Assert
@@ -41,22 +43,23 @@ namespace STS.Tests.Systems.Controllers
         }
 
         [Fact]
-        public async void Get_By_ApplicationId_Should_Return_Role_Collection()
+        public async void Get_By_ApplicationId_Should_Return_Role_Paged_Collection()
         {
             //Arrange
             int applicationId = 1;
-            _roleService.Setup(r => r.GetAsync(applicationId)).ReturnsAsync(RoleMockDatas.RoleCollectionViewModels());
+            var pagination = new PaginationParam() { PageNumber = 1, PageSize = 10 };
+            _roleService.Setup(r => r.GetAsync(applicationId, pagination)).ReturnsAsync(RoleMockDatas.RolePagedCollectionViewModels(pagination));
             var sut = new RoleController(_applicationService.Object, _roleService.Object);
 
             //Act
-            var actionResult = await sut.Get(applicationId);
+            var actionResult = await sut.Get(applicationId, pagination);
             var result = actionResult.Result as OkObjectResult;
 
 
             //Assert
             result.Should().NotBeNull();
-            var roles = result.Value as List<RoleViewModel>;
-            roles.Should().HaveCount(RoleMockDatas.RoleCollectionViewModels().Count());
+            var roles = result.Value as PaginatedResult<RoleViewModel>;
+            roles.Items.Should().HaveCount(RoleMockDatas.RoleCollectionViewModels().Count);
 
         }
 
@@ -71,6 +74,10 @@ namespace STS.Tests.Systems.Controllers
             //Arrange
             int roleId = 1;
             int applicationId = 1;
+            var mockRole = RoleMockDatas.RoleSingleViewModel();
+
+            _roleService.Setup(r => r.GetAsync(applicationId, roleId)).ReturnsAsync(mockRole);
+
             var sut = new RoleController(_applicationService.Object, _roleService.Object);
 
             //Act
@@ -107,6 +114,26 @@ namespace STS.Tests.Systems.Controllers
 
         }
 
+        [Fact]
+        public async void Get_By_ApplicationId_And_Invalid_RoleId_Should_Return_Status_404()
+        {
+            //Arrange
+            int roleId = -1;
+            int applicationId = 1;
+
+            _roleService.Setup(r => r.GetAsync(applicationId, roleId)).ReturnsAsync(() => null);
+            var sut = new RoleController(_applicationService.Object, _roleService.Object);
+
+            //Act
+            var actionResult = await sut.Get(applicationId, roleId);
+            var result = actionResult.Result as NotFoundObjectResult;
+
+
+            //Assert
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(404);
+        }
+
         #endregion
 
 
@@ -121,7 +148,7 @@ namespace STS.Tests.Systems.Controllers
 
             _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(true);
 
-            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.Caption)).ReturnsAsync(false);
+            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.ApplicationId, addFormModel.Caption)).ReturnsAsync(false);
             _roleService.Setup(r => r.AddAsync(addFormModel)).ReturnsAsync(addedId);
             _roleService.Setup(r => r.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(RoleMockDatas.RoleSingleViewModel(addFormModel));
 
@@ -147,7 +174,7 @@ namespace STS.Tests.Systems.Controllers
             var addedId = 1;
 
             _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(true);
-            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.Caption)).ReturnsAsync(false);
+            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.ApplicationId, addFormModel.Caption)).ReturnsAsync(false);
             _roleService.Setup(r => r.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(RoleMockDatas.RoleSingleViewModel(addFormModel));
 
             _roleService.Setup(r => r.AddAsync(addFormModel)).ReturnsAsync(addedId);
@@ -176,7 +203,7 @@ namespace STS.Tests.Systems.Controllers
             var addedId = 1;
 
             _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(false);
-            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.Caption)).ReturnsAsync(false);
+            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.ApplicationId, addFormModel.Caption)).ReturnsAsync(false);
             _roleService.Setup(r => r.AddAsync(addFormModel)).ReturnsAsync(addedId);
             _roleService.Setup(r => r.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(RoleMockDatas.RoleSingleViewModel(addFormModel));
 
@@ -202,7 +229,7 @@ namespace STS.Tests.Systems.Controllers
             var addedId = 1;
 
             _applicationService.Setup(r => r.IsExistAsync(addFormModel.ApplicationId)).ReturnsAsync(true);
-            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.Caption)).ReturnsAsync(true);
+            _roleService.Setup(r => r.IsCaptionDuplicateAsync(addFormModel.ApplicationId, addFormModel.Caption)).ReturnsAsync(true);
             _roleService.Setup(r => r.AddAsync(addFormModel)).ReturnsAsync(addedId);
             _roleService.Setup(r => r.GetAsync(addFormModel.ApplicationId, addedId)).ReturnsAsync(RoleMockDatas.RoleSingleViewModel(addFormModel));
 
@@ -302,7 +329,7 @@ namespace STS.Tests.Systems.Controllers
 
             _applicationService.Setup(r => r.IsExistAsync(updateFormModel.ApplicationId)).ReturnsAsync(true);
             _roleService.Setup(r => r.IsRoleValidAsync(updateFormModel.Id)).ReturnsAsync(true);
-            _roleService.Setup(r => r.IsCaptionDuplicateAsync(updateFormModel.Id, updateFormModel.Caption)).ReturnsAsync(true);
+            _roleService.Setup(r => r.IsCaptionDuplicateAsync(updateFormModel.ApplicationId, updateFormModel.Id, updateFormModel.Caption)).ReturnsAsync(true);
 
             _roleService.Setup(r => r.UpdateAsync(updateFormModel));
             var sut = new RoleController(_applicationService.Object, _roleService.Object);
@@ -320,6 +347,26 @@ namespace STS.Tests.Systems.Controllers
 
         #endregion
 
+        #region UpdateRolePermission
+
+        [Fact]
+        public async void UpdateRolePermission_Should_Return_Status_204()
+        {
+            //Arrang
+            var rolePermissionModel = RoleMockDatas.GetUpdateRolePermissionFormModel();
+            _roleService.Setup(r => r.UpdateRolePermissionAsync(rolePermissionModel));
+            var sut = new RoleController(_applicationService.Object, _roleService.Object);
+
+            //Act
+            var actionResult = await sut.UpdateRolePermission(rolePermissionModel);
+            var result = actionResult as NoContentResult;
+
+            //Assert            
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(204);
+        }
+
+        #endregion
 
         #region Delete
 

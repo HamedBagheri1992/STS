@@ -14,6 +14,7 @@ namespace STS.DataAccessLayer.Entities
         {
             Applications = new List<Application>();
             Roles = new List<Role>();
+            Organizations = new List<Organization>();
         }
 
         public string FirstName { get; set; }
@@ -25,7 +26,7 @@ namespace STS.DataAccessLayer.Entities
         public string Password { get; set; }
 
         public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        public DateTime? ExpirationDate{ get; set; }
 
         public DateTime? LastLogin { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -33,6 +34,7 @@ namespace STS.DataAccessLayer.Entities
 
 
         public virtual ICollection<Application> Applications { get; set; }
+        public virtual ICollection<Organization> Organizations { get; set; }
         public virtual ICollection<Role> Roles { get; set; }
     }
 }

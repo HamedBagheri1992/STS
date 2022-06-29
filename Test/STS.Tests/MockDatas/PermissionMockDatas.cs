@@ -1,6 +1,7 @@
 ﻿using STS.DataAccessLayer.Entities;
 using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
+using STS.DTOs.ResultModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,12 @@ namespace STS.Tests.MockDatas
 {
     public static class PermissionMockDatas
     {
+        public static PaginatedResult<PermissionViewModel> PermissionPagedCollectionViewModels(PaginationParam pagination)
+        {
+            var Items = PermissionCollectionViewModels();
+            return new PaginatedResult<PermissionViewModel>(Items, 3, pagination.PageNumber, pagination.PageSize);
+        }
+
         public static List<PermissionViewModel> PermissionCollectionViewModels()
         {
             return new List<PermissionViewModel>

@@ -24,7 +24,7 @@ namespace STS.Services.Impls
         {
             try
             {
-                var users = _context.Users.Include(a => a.Applications).Include(a => a.Roles).OrderBy(a => a.Id).ToViewModel();
+                var users = _context.Users.Include(a => a.Applications).Include(a => a.Roles).Include(u => u.Organizations).OrderBy(a => a.Id).ToViewModel();
                 return await users.ToPagedListAsync<UserViewModel>(pagination.PageNumber, pagination.PageSize);
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace STS.Services.Impls
         {
             try
             {
-                var user = await _context.Users.Include(u => u.Applications).Include(u => u.Roles).FirstOrDefaultAsync(x => x.Id == id);
+                var user = await _context.Users.Include(u => u.Applications).Include(u => u.Roles).Include(u => u.Organizations).FirstOrDefaultAsync(x => x.Id == id);
                 return user?.ToViewModel();
             }
             catch (Exception ex)
@@ -57,7 +57,7 @@ namespace STS.Services.Impls
                     UserName = addFormModel.UserName,
                     Password = addFormModel.Password.ToHashPassword(),
                     IsActive = addFormModel.IsActive,
-                    IsDeleted = false,
+                    ExpirationDate = addFormModel.ExpirationDate,
                     CreatedDate = DateTime.Now,
                     ModifiedDate = DateTime.Now
                 };
@@ -78,7 +78,7 @@ namespace STS.Services.Impls
             {
                 var user = await _context.Users.FindAsync(updateFormModel.Id);
                 if (user is null)
-                    throw new Exception("UserService : User is Invalid");
+                    throw new STSException("UserService : User is Invalid");
 
                 if (user.FirstName != updateFormModel.FirstName)
                     user.FirstName = updateFormModel.FirstName;
@@ -89,12 +89,22 @@ namespace STS.Services.Impls
                 if (user.UserName != updateFormModel.UserName)
                     user.UserName = updateFormModel.UserName;
 
+                if (!string.IsNullOrEmpty(updateFormModel.Password))
+                    user.Password = updateFormModel.Password.ToHashPassword();
+
                 if (user.IsActive != updateFormModel.IsActive)
                     user.IsActive = updateFormModel.IsActive;
+
+                if (user.ExpirationDate != updateFormModel.ExpirationDate)
+                    user.ExpirationDate = updateFormModel.ExpirationDate;
 
                 user.ModifiedDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {
@@ -108,28 +118,15 @@ namespace STS.Services.Impls
             {
                 var user = await _context.Users.FindAsync(changePasswordFormModel.Id);
                 if (user is null)
-                    throw new Exception("UserService : User is Invalid");
+                    throw new STSException("UserService : User is Invalid");
 
                 user.Password = changePasswordFormModel.NewPassword.ToHashPassword();
 
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (STSException ex)
             {
-                throw new Exception("UserService : ChangePasswordError", ex);
-            }
-        }
-
-        public async Task DeleteAsync(long id)
-        {
-            try
-            {
-                var user = await _context.Users.FindAsync(id);
-                if (user is null)
-                    throw new Exception("UserService : User is Invalid");
-
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
+                throw ex;
             }
             catch (Exception ex)
             {

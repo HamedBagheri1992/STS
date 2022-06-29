@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using STS.Common.BaseModels;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.BaseModels;
 using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
 using STS.Tests.MockDatas;
 using STS.WebApi.Controllers.V1;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace STS.Tests.Systems.Controllers
@@ -57,26 +57,9 @@ namespace STS.Tests.Systems.Controllers
 
             //Assert
             result.Should().NotBeNull();
-            var app = result.Value as PaginatedResult<ApplicationViewModel>;
-            app.Items.Should().NotBeNull();
-            app.Items.Should().HaveCount(mockApplication.Items.Count);
-        }
-
-
-        [Fact]
-        public async void Get_By_Id_Should_Return_Status_200()
-        {
-            //Arrange
-            int id = 1;
-            var sut = new ApplicationController(_applicationService.Object);
-
-            //Act
-            var actionResult = await sut.Get(id);
-            var actionStatus = actionResult.Result as OkObjectResult;
-
-            //Assert
-            actionResult.Should().NotBeNull();
-            actionStatus.StatusCode.Should().Be(200);
+            var apps = result.Value as PaginatedResult<ApplicationViewModel>;
+            apps.Items.Should().NotBeNull();
+            apps.Items.Should().HaveCount(mockApplication.Items.Count);
         }
 
         [Fact]
@@ -99,24 +82,45 @@ namespace STS.Tests.Systems.Controllers
             app.Title.Should().NotBeNull();
         }
 
-
         [Fact]
-        public async void Get_By_Invalid_Id_Should_Return_Null()
+        public async void Get_By_Invalid_Id_Should_Return_Status_404()
         {
             //Arrange
-            long id = -1;
+            long id = It.IsAny<long>();
             _applicationService.Setup(a => a.GetAsync(id)).ReturnsAsync(() => null);
             var sut = new ApplicationController(_applicationService.Object);
 
             //Act
             var actionResult = await sut.Get(id);
-            var result = actionResult.Result as OkObjectResult;
-
+            var actionStatus = actionResult.Result as NotFoundObjectResult;
 
             //Assert
-            result.Should().NotBeNull();
-            result.Value.Should().BeNull();
+            actionResult.Should().NotBeNull();
+            actionStatus.StatusCode.Should().Be(404);
         }
+
+        #endregion
+
+
+        #region GetItemList
+
+        [Fact]
+        public async void GetItemList_Should_Return_Status_200()
+        {
+            //Arrang
+            _applicationService.Setup(a => a.GetItemListAsync()).ReturnsAsync(ApplicationMockDatas.SelectItemListModels());
+            var sut = new ApplicationController(_applicationService.Object);
+
+            //Act
+            var actionResult = await sut.GetItemList();
+            var result = actionResult.Result as OkObjectResult;
+
+            //Assert
+            actionResult.Should().NotBeNull();
+            result.StatusCode.Should().Be(200);
+            result.Value.Should().BeOfType<List<SelectItemListModel>>();
+        }
+
         #endregion
 
 
@@ -165,8 +169,6 @@ namespace STS.Tests.Systems.Controllers
             var result = actionResult.Value as ApplicationViewModel;
 
             //Assert            
-            _applicationService.Verify(a => a.AddAsync(addFormModel), Times.Once);
-
             actionResult.Value.Should().NotBeNull();
 
             result.Id.Should().NotBe(0);

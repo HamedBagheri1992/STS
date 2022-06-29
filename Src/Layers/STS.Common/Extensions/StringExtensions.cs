@@ -14,7 +14,8 @@ namespace STS.Common.Extensions
 
         public static bool HasSpecialChars(this string input)
         {
-            return input.Any(ch => !Char.IsLetterOrDigit(ch));
+            //return input.Any(ch => !Char.IsLetterOrDigit(ch));
+            return input.Contains(' ');
         }
     }
 }

@@ -203,13 +203,10 @@ namespace STS.Tests.Systems.Controllers
         {
             //Arrange
             var addFormModel = UserMockDatas.AddFormModel();
-            addFormModel.UserName = "U_1";
-            var addedId = 1;
+            addFormModel.UserName = "User Name";
 
             _userService.Setup(u => u.IsUserNameDuplicateAsync(addFormModel.UserName)).ReturnsAsync(false);
-            _userService.Setup(u => u.AddAsync(addFormModel)).ReturnsAsync(addedId);
-            _userService.Setup(u => u.GetAsync(addedId)).ReturnsAsync(UserMockDatas.UserSingleViewModel(addFormModel));
-
+         
             var sut = new UserController(_userService.Object);
 
             //Act
@@ -299,12 +296,8 @@ namespace STS.Tests.Systems.Controllers
         {
             //Arrange
             var updateFormModel = UserMockDatas.UpdateFormModel();
-            updateFormModel.UserName = "U_1";
-
-            _userService.Setup(u => u.IsExistAsync(updateFormModel.Id)).ReturnsAsync(true);
-            _userService.Setup(u => u.IsUserNameDuplicateAsync(updateFormModel.Id, updateFormModel.UserName)).ReturnsAsync(false);
-
-            _userService.Setup(u => u.UpdateAsync(updateFormModel));
+            updateFormModel.UserName = "Usre Name";
+            
             var sut = new UserController(_userService.Object);
 
             //Act
@@ -361,51 +354,6 @@ namespace STS.Tests.Systems.Controllers
 
             //Assert
             _userService.Verify(ur => ur.ChangePasswordAsync(changePasswordFormModel), Times.Never);
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(400);
-            result.Value.Should().BeOfType(typeof(ErrorDetails));
-        }
-
-        #endregion
-
-        #region Delete
-
-        [Fact]
-        public async void Delete_Should_Return_Status_204()
-        {
-            //Arrang
-            long id = 1;
-            _userService.Setup(u => u.IsExistAsync(id)).ReturnsAsync(true);
-            _userService.Setup(u => u.DeleteAsync(id));
-
-            var sut = new UserController(_userService.Object);
-
-            //Act
-            var actionResult = await sut.Delete(id);
-            var result = actionResult as NoContentResult;
-
-            //Assert
-            _userService.Verify(ap => ap.DeleteAsync(id), Times.Once);
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(204);
-        }
-
-        [Fact]
-        public async void Delete_Invalid_User_Return_Status_400()
-        {
-            //Arrange
-            long id = 1;
-            _userService.Setup(u => u.IsExistAsync(id)).ReturnsAsync(false);
-
-            _userService.Setup(u => u.DeleteAsync(id));
-            var sut = new UserController(_userService.Object);
-
-            //Act
-            var actionResult = await sut.Delete(id);
-            var result = actionResult as BadRequestObjectResult;
-
-            //Assert
-            _userService.Verify(ap => ap.DeleteAsync(id), Times.Never);
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(400);
             result.Value.Should().BeOfType(typeof(ErrorDetails));

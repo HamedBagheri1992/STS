@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using STS.DTOs.ResultModels;
 using STS.DTOs.RoleModels.FormModels;
 using STS.DTOs.RoleModels.ViewModels;
 using STS.Interfaces.Contracts;
@@ -22,26 +23,29 @@ namespace STS.WebApi.Controllers.V1
         }
 
         [HttpGet("{applicationId}")]
-        public async Task<ActionResult<IEnumerable<RoleViewModel>>> Get(long applicationId)
+        public async Task<ActionResult<PaginatedResult<RoleViewModel>>> Get([FromRoute] long applicationId, [FromQuery] PaginationParam pagination)
         {
-            var roles = await _roleService.GetAsync(applicationId);
+            var roles = await _roleService.GetAsync(applicationId, pagination);
             return Ok(roles);
         }
 
         [HttpGet("{applicationId}/{roleId}")]
-        public async Task<ActionResult<RoleViewModel>> Get(long applicationId, long roleId)
+        public async Task<ActionResult<RoleViewModel>> Get([FromRoute] long applicationId, [FromRoute] long roleId)
         {
             var role = await _roleService.GetAsync(applicationId, roleId);
+            if (role is null)
+                return NotError("RoleId is Invalid");
+
             return Ok(role);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(AddRoleFormModel addFormModel)
+        public async Task<IActionResult> Post([FromBody] AddRoleFormModel addFormModel)
         {
             if (!await _applicationService.IsExistAsync(addFormModel.ApplicationId))
                 return BadError("ApplicationId is Invalid");
 
-            if (await _roleService.IsCaptionDuplicateAsync(addFormModel.Caption))
+            if (await _roleService.IsCaptionDuplicateAsync(addFormModel.ApplicationId, addFormModel.Caption))
                 return BadError("Role Caption is Duplicate");
 
             long roleId = await _roleService.AddAsync(addFormModel);
@@ -53,6 +57,14 @@ namespace STS.WebApi.Controllers.V1
             return CreatedAtAction(nameof(Get), new { applicationId = addedRole.ApplicationId, roleId = addedRole.Id }, addedRole);
         }
 
+        [HttpPut("[action]")]
+        public async Task<IActionResult> UpdateRolePermission([FromBody] UpdateRolePermissionFormModel updateRolePermissionFormModel)
+        {
+            await _roleService.UpdateRolePermissionAsync(updateRolePermissionFormModel);
+
+            return NoContent();
+        }
+
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] UpdateRoleFormModel updateFormModel)
         {
@@ -62,7 +74,7 @@ namespace STS.WebApi.Controllers.V1
             if (!await _roleService.IsRoleValidAsync(updateFormModel.Id))
                 return BadError("Role is Invalid");
 
-            if (await _roleService.IsCaptionDuplicateAsync(updateFormModel.Id, updateFormModel.Caption))
+            if (await _roleService.IsCaptionDuplicateAsync(updateFormModel.ApplicationId, updateFormModel.Id, updateFormModel.Caption))
                 return BadError("Role Caption is Duplicate");
 
 

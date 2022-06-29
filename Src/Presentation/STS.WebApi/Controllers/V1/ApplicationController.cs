@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using STS.DTOs.ApplicationModels.FormModels;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.BaseModels;
 using STS.DTOs.ResultModels;
 using STS.Interfaces.Contracts;
 
@@ -32,7 +33,17 @@ namespace STS.WebApi.Controllers.V1
         public async Task<ActionResult<ApplicationViewModel>> Get([FromRoute] long id)
         {
             var application = await _applicationService.GetAsync(id);
+            if (application is null)
+                return NotError("Application is Invalid");
+
             return Ok(application);
+        }
+
+        [HttpGet("[action]")]
+        public async Task<ActionResult<IEnumerable<SelectItemListModel>>> GetItemList()
+        {
+            var items = await _applicationService.GetItemListAsync();
+            return Ok(items);
         }
 
         [HttpPost]

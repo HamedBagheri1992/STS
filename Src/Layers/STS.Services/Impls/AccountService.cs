@@ -1,17 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using STS.Common.BaseModels;
 using STS.Common.Configuration;
 using STS.Common.Extensions;
 using STS.DataAccessLayer;
 using STS.DTOs.AccountModels.FormModels;
-using STS.DTOs.PermissionModels.ViewModels;
-using STS.DTOs.UserModels.ViewModels;
 using STS.Interfaces.Contracts;
 using STS.Services.Helper;
 using STS.Services.Mappers;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace STS.Services.Impls
 {
@@ -26,16 +22,24 @@ namespace STS.Services.Impls
             _options = options;
         }
 
-        public async Task<UserViewModel?> LoginAsync(LoginFormModel formModel)
+        public async Task<UserIdentityBaseModel?> LoginAsync(LoginFormModel formModel)
         {
             try
             {
                 string password = formModel.Password.ToHashPassword();
 
-                var user = await _context.Users.Include(u => u.Applications).ThenInclude(t => t.Roles).ThenInclude(t => t.Permissions)
+                var user = await _context.Users.Include(u => u.Applications).Include(t => t.Roles).ThenInclude(t => t.Permissions)
                     .FirstOrDefaultAsync(u => u.UserName == formModel.UserName && u.Password == password && u.Applications.Any(a => a.Id == formModel.AppId && a.SecretKey == formModel.SecretKey));
 
-                return user?.ToViewModel();
+                if (user is null)
+                    return null;
+
+                var application = user.Applications.First(a => a.Id == formModel.AppId);
+                var roles = user.ToRoleKeyValueModel().ToList();
+                var permissions = user.ToPermissionKeyValueModel().ToList();
+
+                var userIdentity = user.ToUserIdentityBaseModel(application, roles, permissions);
+                return userIdentity;
             }
             catch (Exception ex)
             {
@@ -43,11 +47,11 @@ namespace STS.Services.Impls
             }
         }
 
-        public string GenerateToken(UserViewModel user, List<PermissionViewModel> permissions)
+        public string GenerateToken(UserIdentityBaseModel userIdentity)
         {
             try
             {
-                return user.ToJwtTokenGenerator(_options, permissions);
+                return userIdentity.ToJwtTokenGenerator(_options);
             }
             catch (Exception ex)
             {
@@ -55,16 +59,20 @@ namespace STS.Services.Impls
             }
         }
 
-        public async Task UpdateLastLoginAsync(UserViewModel userModel)
+        public async Task UpdateLastLoginAsync(UserIdentityBaseModel userModel)
         {
             try
             {
                 var user = await _context.Users.FindAsync(userModel.Id);
                 if (user is null)
-                    throw new Exception("Problem on Login to System");
+                    throw new STSException("Problem on Login to System");
 
                 user.LastLogin = DateTime.Now;
                 await _context.SaveChangesAsync();
+            }
+            catch (STSException ex)
+            {
+                throw ex;
             }
             catch (Exception ex)
             {

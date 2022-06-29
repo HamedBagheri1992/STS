@@ -28,6 +28,8 @@ builder.Services.AddTransient<IApplicationService, ApplicationService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPermissionService, PermissionService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IOrganizationService, OrganizationService>();
+builder.Services.AddTransient<ICategoryService, CategoryService>();
 
 
 builder.Services.AddDbContext(builder.Configuration);

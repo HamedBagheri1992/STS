@@ -18,6 +18,8 @@ namespace STS.DataAccessLayer
         public virtual DbSet<Application> Applications { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
+        public virtual DbSet<Organization> Organizations { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,6 +53,16 @@ namespace STS.DataAccessLayer
                     j.HasOne<Role>().WithMany().HasForeignKey("RolesId").HasConstraintName("FK_RolePermission_Roless_RolesId").OnDelete(DeleteBehavior.NoAction);
                     j.HasOne<Permission>().WithMany().HasForeignKey("PermissionsId").HasConstraintName("FK_RolePermission_Permissions_PermissionsId").OnDelete(DeleteBehavior.NoAction);
                 });
+            });
+
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.HasMany(o => o.Children).WithOne(o => o.Parent).HasForeignKey(o => o.ParentId).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasIndex(c => new { c.ApplicationId, c.Title }).IsUnique();
             });
 
             base.OnModelCreating(modelBuilder);

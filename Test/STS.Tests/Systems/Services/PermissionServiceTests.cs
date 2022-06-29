@@ -1,9 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using STS.Common.BaseModels;
 using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
+using STS.DTOs.PermissionModels.FormModels;
 using STS.DTOs.PermissionModels.ViewModels;
+using STS.DTOs.ResultModels;
 using STS.Services.Impls;
 using STS.Tests.Helpers;
 using STS.Tests.MockDatas;
@@ -50,10 +53,11 @@ namespace STS.Tests.Systems.Services
         #region Get
 
         [Fact]
-        public async void Get_By_RoleId_Should_Return_Collection_Permissions()
+        public async void Get_By_ApplicationId_Should_Return_Collection_Permissions()
         {
             //Arrange
-            var roleId = 1;
+            var applicationId = 1;
+            var pagination = new PaginationParam { PageNumber = 1, PageSize = 10 };
             var data = PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable();
 
             _mockPermissionSet.IqueryableRegisteration(data);
@@ -61,12 +65,12 @@ namespace STS.Tests.Systems.Services
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.GetAsync(roleId);
+            var result = await sut.GetAsync(applicationId, pagination);
 
             //Assert
             result.Should().NotBeNull();
-            result.Should().BeOfType<List<PermissionViewModel>>();
-            result.Should().HaveCount(data.Count());
+            result.Should().BeOfType<PaginatedResult<PermissionViewModel>>();
+            result.Items.Should().HaveCount(data.Count());
         }
 
         [Fact]
@@ -92,10 +96,10 @@ namespace STS.Tests.Systems.Services
         }
 
         [Fact]
-        public async void Get_By_RoleId_And_Invalid_PermissionId_Should_Return_Null()
+        public async void Get_By_ApplicationId_And_Invalid_PermissionId_Should_Return_Null()
         {
             //Arrange
-            long roleId = 1;
+            long applicationId = 1;
             long permissionId = -1;
             var data = PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable();
 
@@ -104,7 +108,7 @@ namespace STS.Tests.Systems.Services
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.GetAsync(roleId, permissionId);
+            var result = await sut.GetAsync(applicationId, permissionId);
 
             //Assert
             result.Should().BeNull();
@@ -128,6 +132,70 @@ namespace STS.Tests.Systems.Services
 
             //Assert
             _mockContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        #endregion
+
+        #region UpdatePermissionCategory
+
+        [Fact]
+        public async void UpdatePermissionCategory_Should_Call_SaveChanges()
+        {
+            //Arrange
+            var updateFormModel = new UpdatePermissionCategoryFormModel { CategoryId = 1, PermissionIds = new List<long> { 1, 2, 3 } };
+            var data = PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable();
+
+            _mockPermissionSet.IqueryableRegisteration(data);
+            _mockContext.Setup(c => c.Permissions).Returns(_mockPermissionSet.Object);
+
+            //Act
+            var sut = new PermissionService(_mockContext.Object);
+            await sut.UpdatePermissionCategoryAsync(updateFormModel);
+
+
+            //Assert            
+            _mockContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async void UpdatePermissionCategory_By_Invalid_Permission_Collection_Should_Return_Exception()
+        {
+            //Arrange
+            var updateFormModel = new UpdatePermissionCategoryFormModel { CategoryId = 1, PermissionIds = new List<long> { 1, 2, 4 } };
+            var data = PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable();
+
+            _mockPermissionSet.IqueryableRegisteration(data);
+            _mockContext.Setup(c => c.Permissions).Returns(_mockPermissionSet.Object);
+
+            //Act
+            var sut = new PermissionService(_mockContext.Object);
+            var ex = await Assert.ThrowsAsync<STSException>(async () => await sut.UpdatePermissionCategoryAsync(updateFormModel));
+
+            //Assert            
+            ex.Should().NotBeNull();
+            ex.Message.Should().Be("Some of the Permissions are invalid");
+        }
+
+        [Fact]
+        public async void UpdatePermissionCategory_Which_Permission_By_Diffrent_ApplicationId_Should_Return_Exception()
+        {
+            //Arrange
+            var updateFormModel = new UpdatePermissionCategoryFormModel { CategoryId = 1, PermissionIds = new List<long> { 1, 2, 3 } };
+
+            var parameters = PermissionMockDatas.PermissionCollectionEntityModels();
+            parameters[0].ApplicationId = 2;
+            var data = parameters.AsQueryable();
+
+            _mockPermissionSet.IqueryableRegisteration(data);
+            _mockContext.Setup(c => c.Permissions).Returns(_mockPermissionSet.Object);
+
+            //Act
+            var sut = new PermissionService(_mockContext.Object);
+            var ex = await Assert.ThrowsAsync<STSException>(async () => await sut.UpdatePermissionCategoryAsync(updateFormModel));
+
+            //Assert            
+            ex.Should().NotBeNull();
+            ex.Message.Should().Be("Permission are not in an Application");
         }
 
         #endregion
@@ -201,13 +269,14 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             string title = "Permission_Unique";
+            long applicationId = 1;
 
             _mockPermissionSet.IqueryableRegisteration<Permission>(PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Permissions).Returns(_mockPermissionSet.Object);
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.IsTitleDuplicateAsync(title);
+            var result = await sut.IsTitleDuplicateAsync(applicationId, title);
 
             //Assert
             result.Should().BeFalse();
@@ -218,13 +287,14 @@ namespace STS.Tests.Systems.Services
         {
             //Arrange
             string title = "Permission_1";
+            long applicationId = 1;
 
             _mockPermissionSet.IqueryableRegisteration<Permission>(PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Permissions).Returns(_mockPermissionSet.Object);
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.IsTitleDuplicateAsync(title);
+            var result = await sut.IsTitleDuplicateAsync(applicationId, title);
 
             //Assert
             result.Should().BeTrue();
@@ -258,13 +328,14 @@ namespace STS.Tests.Systems.Services
             //Arrange
             long permissionId = 2;
             string title = "Permission_1";
+            long applicationId = 1;
 
             _mockPermissionSet.IqueryableRegisteration<Permission>(PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Permissions).Returns(_mockPermissionSet.Object);
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.IsTitleDuplicateAsync(permissionId, title);
+            var result = await sut.IsTitleDuplicateAsync(applicationId, permissionId, title);
 
             //Assert
             result.Should().BeTrue();
@@ -277,13 +348,14 @@ namespace STS.Tests.Systems.Services
             //Arrange
             long permissionId = 1;
             string title = "Permission_1";
+            long applicationId = 1;
 
             _mockPermissionSet.IqueryableRegisteration<Permission>(PermissionMockDatas.PermissionCollectionEntityModels().AsQueryable());
             _mockContext.Setup(m => m.Permissions).Returns(_mockPermissionSet.Object);
 
             //Act
             var sut = new PermissionService(_mockContext.Object);
-            var result = await sut.IsTitleDuplicateAsync(permissionId, title);
+            var result = await sut.IsTitleDuplicateAsync(applicationId, permissionId, title);
 
             //Assert
             result.Should().BeFalse();

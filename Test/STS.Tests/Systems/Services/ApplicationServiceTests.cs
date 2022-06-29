@@ -4,16 +4,14 @@ using Moq;
 using STS.DataAccessLayer;
 using STS.DataAccessLayer.Entities;
 using STS.DTOs.ApplicationModels.ViewModels;
+using STS.DTOs.BaseModels;
 using STS.DTOs.ResultModels;
 using STS.Services.Impls;
 using STS.Tests.Helpers;
 using STS.Tests.MockDatas;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace STS.Tests.Systems.Services
@@ -107,6 +105,24 @@ namespace STS.Tests.Systems.Services
 
             //Assert
             result.Should().BeNull();
+        }
+
+        [Fact]
+        public async void GetItemList_Should_Return_SelectItem_Collection()
+        {
+            //Arrang
+            var data = ApplicationMockDatas.ApplicationCollectionEntityModels().AsQueryable();
+
+            _mockApplicationSet.IqueryableRegisteration(data);
+            _mockContext.Setup(c => c.Applications).Returns(_mockApplicationSet.Object);
+
+            //Act
+            var sut = new ApplicationService(_mockContext.Object);
+            var result = await sut.GetItemListAsync();
+
+            //Assert
+            result.Should().BeOfType(typeof(List<SelectItemListModel>));
+            result.Should().HaveCount(data.Count());
         }
 
         #endregion

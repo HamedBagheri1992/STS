@@ -107,29 +107,6 @@ namespace STS.Tests.Systems.Services
 
         #endregion
 
-        #region Delete
-
-        [Fact]
-        public async void Delete_Save_A_User_Via_Context()
-        {
-            //Arrange
-            long id = 1;
-            var entity = UserMockDatas.EntityModel();
-
-            _mockContext.Setup(u => u.Users).Returns(_mockUserSet.Object);
-            _mockUserSet.Setup(m => m.FindAsync(id)).ReturnsAsync(entity);
-
-            //Act
-            var sut = new UserService(_mockContext.Object);
-            await sut.DeleteAsync(id);
-
-            //Assert
-            _mockUserSet.Verify(m => m.Remove(entity), Times.Once);
-            _mockContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        #endregion
-
         #region IsExist
 
         [Fact]
