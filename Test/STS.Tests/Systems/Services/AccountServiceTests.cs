@@ -35,7 +35,7 @@ namespace STS.Tests.Systems.Services
             var model = new BearerTokensConfigurationModel
             {
                 Key = "STSSystem14012024Token",
-                Issuer = "http://localhost=1100/",
+                Issuer = "http://localhost:1100/",
                 Audience = "Any",
                 AccessTokenExpirationDays = 365,
                 RefreshTokenExpirationDays = 700,
