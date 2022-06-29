@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,10 @@ namespace STS.DataAccessLayer.Entities
         }
 
         public long? ParentId { get; set; }
+
+        [Required]
         public string Title { get; set; }
+
         public string Tag { get; set; }
         public string Description { get; set; }
 
